@@ -36,3 +36,5 @@
     deepEqual(this.elems.filter(":django_formset").get(), this.elems.last().get(), "knows awesome when it sees it");
   });
 })(jQuery);
+
+//# sourceMappingURL=django-formset_test.js.map
