@@ -33,19 +33,6 @@
     strictEqual(this.elems.django_formset(), this.elems, 'should be chainable');
   });
 
-  test('is awesome', function() {
-    expect(1);
-    strictEqual(this.elems.django_formset().text(), 'awesome0awesome1awesome2', 'should be awesome');
-  });
-
-  module('jQuery.django_formset');
-
-  test('is awesome', function() {
-    expect(2);
-    strictEqual($.django_formset(), 'awesome.', 'should be awesome');
-    strictEqual($.django_formset({punctuation: '!'}), 'awesome!', 'should be thoroughly awesome');
-  });
-
   module(':django_formset selector', {
     // This will run before each test in this module.
     setup: function() {
