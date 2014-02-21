@@ -64,11 +64,11 @@ module.exports = function(grunt) {
       },
       src: {
         files: ['src/**/*.coffee'],
-        tasks: ['coffee:src', 'jshint:src', 'qunit']
+        tasks: ['coffee:src', 'jshint:src', 'qunit', 'clean', 'concat', 'uglify']
       },
       test: {
         files: ['test/**/*.coffee', 'test/django-formset.html'],
-        tasks: ['coffee:test', 'jshint:test', 'qunit']
+        tasks: ['coffee:test', 'jshint:test', 'qunit', 'clean', 'concat', 'uglify']
       },
     },
     coffee: {
