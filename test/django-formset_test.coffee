@@ -24,29 +24,30 @@
 
     # This will run before each test in this module.
     setup: ->
-      @elems = $("#qunit-fixture").children()
+      all_fixtures = $("#qunit-fixture")
+      @fixture_simple_list = all_fixtures.find '#simple-list'
       return
 
   test "can add form", ->
-    formset = @elems.django_formset()
+    formset = @fixture_simple_list.django_formset()
 
-    equal @elems.find(".empty-form").length, 1, "there's exactly one template form"
-    equal @elems.find(":visible").length, 3, "and three visible templates"
+    equal @fixture_simple_list.find(".empty-form").length, 1, "there's exactly one template form"
+    equal @fixture_simple_list.find(":visible").length, 3, "and three visible templates"
 
     formset.addForm()
 
-    equal @elems.find(".empty-form").length, 1, "there's still exactly one template form"
-    equal @elems.find(":visible").length, 4, "but now four visible templates"
+    equal @fixture_simple_list.find(".empty-form").length, 1, "there's still exactly one template form"
+    equal @fixture_simple_list.find(":visible").length, 4, "but now four visible templates"
 
     return
 
   test "adds form at the end", ->
-    formset = @elems.django_formset()
-    equal @elems.find(":visible:last-child").text(), "awesome test markup",
+    formset = @fixture_simple_list.django_formset()
+    equal @fixture_simple_list.find(":visible:last-child").text(), "awesome test markup",
       "just checking current last form"
 
     formset.addForm()
-    last_child = @elems.find ":visible:last-child"
+    last_child = @fixture_simple_list.find ":visible:last-child"
     equal last_child.text(), "template",
       "first new form was added at the end"
 
@@ -55,7 +56,7 @@
       "the text of the newly added form was changed"
 
     formset.addForm()
-    last_child = @elems.find ":visible:last-child"
+    last_child = @fixture_simple_list.find ":visible:last-child"
     equal last_child.text(), "template",
       "second new form was added at the end"
 
