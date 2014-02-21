@@ -67,8 +67,8 @@ module.exports = function(grunt) {
         tasks: ['coffee:src', 'jshint:src', 'qunit']
       },
       test: {
-        files: '<%= jshint.test.src %>',
-        tasks: ['jshint:test', 'qunit']
+        files: ['test/**/*.coffee'],
+        tasks: ['coffee:test', 'jshint:test', 'qunit']
       },
     },
     coffee: {
@@ -79,7 +79,12 @@ module.exports = function(grunt) {
         files: {
           'src/django-formset.js': 'src/django-formset.coffee'
         },
-      }
+      },
+      test: {
+        files: {
+          'test/django-formset_test.js': 'test/django-formset_test.coffee'
+        },
+      },
     },
   });
 
