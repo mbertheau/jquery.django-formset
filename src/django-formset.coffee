@@ -16,11 +16,11 @@
 
     template = base.find "> .empty-form"
 
-    last_form = base.children().last()
+    lastForm = base.children().last()
     addForm: ->
-      new_form = template.clone().removeClass("empty-form")
-      new_form.insertAfter last_form
-      last_form = new_form
+      newForm = template.clone().removeClass "empty-form"
+      newForm.insertAfter lastForm
+      lastForm = newForm
       return
 
   return
