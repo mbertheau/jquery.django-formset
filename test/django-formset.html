@@ -15,13 +15,21 @@
        you REALLY want to mess around with jQuery in the console. REMEMBER WE
        ARE TESTING A PLUGIN HERE, THIS HELPS ENSURE BEST PRACTICES. REALLY. -->
   <script>window._$ = jQuery.noConflict(true);</script>
+  <style>
+#qunit-fixture .empty-form {
+    display: none;
+}
+  </style>
 </head>
 <body>
   <div id="qunit"></div>
   <div id="qunit-fixture">
-    <span>lame test markup</span>
-    <span>normal test markup</span>
-    <span>awesome test markup</span>
+      <ul>
+          <li class="empty-form">template</li>
+          <li>lame test markup</li>
+          <li>normal test markup</li>
+          <li>awesome test markup</li>
+      </ul>
   </div>
 </body>
 </html>

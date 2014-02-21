@@ -3,7 +3,16 @@
 * Copyright (c) 2014 Markus Bertheau; Licensed MIT */
 (function($) {
   $.fn.django_formset = function() {
-    return this;
+    var last_form, template;
+    template = this.find("> .empty-form");
+    last_form = this.children().last();
+    return {
+      addForm: function() {
+        var new_form;
+        new_form = template.clone().removeClass("empty-form");
+        new_form.insertAfter(last_form);
+      }
+    };
   };
   $.expr[":"].django_formset = function(elem) {
     return $(elem).text().indexOf("awesome") !== -1;

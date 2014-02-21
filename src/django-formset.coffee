@@ -9,7 +9,12 @@
 
   # Collection method.
   $.fn.django_formset = ->
-    this
+    template = @find "> .empty-form"
+    last_form = @children().last()
+    addForm: ->
+      new_form = template.clone().removeClass("empty-form")
+      new_form.insertAfter last_form
+      return
 
   # Custom selector.
   $.expr[":"].django_formset = (elem) ->

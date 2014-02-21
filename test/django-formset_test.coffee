@@ -27,6 +27,18 @@
       @elems = $("#qunit-fixture").children()
       return
 
+  test "can add form", ->
+    formset = @elems.django_formset()
+
+    equal @elems.find(".empty-form").length, 1, "there's exactly one template form"
+    equal @elems.find(":visible").length, 3, "and three visible templates"
+
+    formset.addForm()
+
+    equal @elems.find(".empty-form").length, 1, "there's still exactly one template form"
+    equal @elems.find(":visible").length, 4, "but now four visible templates"
+
+    return
 
   module ":django_formset selector",
 
