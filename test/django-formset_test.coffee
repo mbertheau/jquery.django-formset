@@ -40,6 +40,27 @@
 
     return
 
+  test "adds form at the end", ->
+    formset = @elems.django_formset()
+    equal @elems.find(":visible:last-child").text(), "awesome test markup",
+      "just checking current last form"
+
+    formset.addForm()
+    last_child = @elems.find ":visible:last-child"
+    equal last_child.text(), "template",
+      "first new form was added at the end"
+
+    last_child.text "this is the form that was added first"
+    equal last_child.text(), "this is the form that was added first",
+      "the text of the newly added form was changed"
+
+    formset.addForm()
+    last_child = @elems.find ":visible:last-child"
+    equal last_child.text(), "template",
+      "second new form was added at the end"
+
+    return
+
   module ":django_formset selector",
 
     # This will run before each test in this module.

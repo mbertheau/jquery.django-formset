@@ -11,6 +11,7 @@
         var new_form;
         new_form = template.clone().removeClass("empty-form");
         new_form.insertAfter(last_form);
+        last_form = new_form;
       }
     };
   };
