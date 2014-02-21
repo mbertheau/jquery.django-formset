@@ -62,19 +62,5 @@
 
     return
 
-  module ":django_formset selector",
-
-    # This will run before each test in this module.
-    setup: ->
-      @elems = $("#qunit-fixture").children()
-      return
-
-  test "is awesome", ->
-    expect 1
-
-    # Use deepEqual & .get() when comparing jQuery objects.
-    deepEqual @elems.filter(":django_formset").get(), @elems.last().get(), "knows awesome when it sees it"
-    return
-
   return
 ) jQuery

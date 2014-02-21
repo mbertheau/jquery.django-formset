@@ -17,11 +17,5 @@
       last_form = new_form
       return
 
-  # Custom selector.
-  $.expr[":"].django_formset = (elem) ->
-
-    # Is this element awesome?
-    $(elem).text().indexOf("awesome") isnt -1
-
   return
 ) jQuery
