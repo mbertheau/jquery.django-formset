@@ -27,12 +27,6 @@
       @elems = $("#qunit-fixture").children()
       return
 
-  test "is chainable", ->
-    expect 1
-
-    # Not a bad test to run on collection methods.
-    strictEqual @elems.django_formset(), @elems, "should be chainable"
-    return
 
   module ":django_formset selector",
 

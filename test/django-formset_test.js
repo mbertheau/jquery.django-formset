@@ -4,10 +4,6 @@
       this.elems = $("#qunit-fixture").children();
     }
   });
-  test("is chainable", function() {
-    expect(1);
-    strictEqual(this.elems.django_formset(), this.elems, "should be chainable");
-  });
   module(":django_formset selector", {
     setup: function() {
       this.elems = $("#qunit-fixture").children();
