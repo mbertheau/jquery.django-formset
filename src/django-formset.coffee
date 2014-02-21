@@ -9,8 +9,14 @@
 
   # Collection method.
   $.fn.django_formset = ->
-    template = @find "> .empty-form"
-    last_form = @children().last()
+    base = this
+
+    if @prop("tagName") == "TABLE"
+      base = @children("tbody")
+
+    template = base.find "> .empty-form"
+
+    last_form = base.children().last()
     addForm: ->
       new_form = template.clone().removeClass("empty-form")
       new_form.insertAfter last_form

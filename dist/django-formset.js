@@ -3,9 +3,13 @@
 * Copyright (c) 2014 Markus Bertheau; Licensed MIT */
 (function($) {
   $.fn.django_formset = function() {
-    var last_form, template;
-    template = this.find("> .empty-form");
-    last_form = this.children().last();
+    var base, last_form, template;
+    base = this;
+    if (this.prop("tagName") === "TABLE") {
+      base = this.children("tbody");
+    }
+    template = base.find("> .empty-form");
+    last_form = base.children().last();
     return {
       addForm: function() {
         var new_form;

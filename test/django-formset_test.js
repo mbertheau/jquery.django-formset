@@ -4,6 +4,7 @@
       var all_fixtures;
       all_fixtures = $("#qunit-fixture");
       this.fixture_simple_list = all_fixtures.find('#simple-list');
+      this.fixture_simple_table = all_fixtures.find('#simple-table');
     }
   });
   test("can add form", function() {
@@ -27,6 +28,13 @@
     formset.addForm();
     last_child = this.fixture_simple_list.find(":visible:last-child");
     equal(last_child.text(), "template", "second new form was added at the end");
+  });
+  test("adds forms to tables as new rows", function() {
+    var formset;
+    formset = this.fixture_simple_table.django_formset();
+    equal(this.fixture_simple_table.find('tbody > tr:visible').length, 0, "no forms there initially");
+    formset.addForm();
+    equal(this.fixture_simple_table.find('tbody > tr:visible').length, 1, "one row was added");
   });
 })(jQuery);
 

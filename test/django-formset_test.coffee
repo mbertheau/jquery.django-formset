@@ -26,6 +26,7 @@
     setup: ->
       all_fixtures = $("#qunit-fixture")
       @fixture_simple_list = all_fixtures.find '#simple-list'
+      @fixture_simple_table = all_fixtures.find '#simple-table'
       return
 
   test "can add form", ->
@@ -59,6 +60,15 @@
     last_child = @fixture_simple_list.find ":visible:last-child"
     equal last_child.text(), "template",
       "second new form was added at the end"
+
+    return
+
+  test "adds forms to tables as new rows", ->
+    formset = @fixture_simple_table.django_formset()
+    equal @fixture_simple_table.find('tbody > tr:visible').length, 0, "no forms there initially"
+
+    formset.addForm()
+    equal @fixture_simple_table.find('tbody > tr:visible').length, 1, "one row was added"
 
     return
 
