@@ -27,6 +27,7 @@
       allFixtures = $("#qunit-fixture")
       @fixtureSimpleList = allFixtures.find '#simple-list'
       @fixtureSimpleTable = allFixtures.find '#simple-table'
+      @fixtureDivWithForm = allFixtures.find '#div-with-form'
       return
 
   test "can add form", ->
@@ -71,6 +72,32 @@
     equal @fixtureSimpleTable.find('tbody > tr:visible').length, 1, "one row was added"
 
     return
+
+  test "replaces form index template and updates TOTAL_FORMS", ->
+    checkFormIndex = (formset, index) ->
+      equal parseInt(formset.find('input[name="object_set-TOTAL_FORMS"]').val()), index + 1,
+        "after adding one form TOTAL_FORMS is #{index + 1}"
+      equal formset.find('div:visible input[type="text"]').last().attr('name'), "object_set-#{index}-text",
+        "the text input's name has the id #{index} in it"
+      equal formset.find('div:visible select').last().attr('name'), "object_set-#{index}-select",
+        "the select's name has the id #{index} in it"
+      equal formset.find('div:visible textarea').last().attr('name'), "object_set-#{index}-textarea",
+        "the textarea's name has the id #{index} in it"
+      equal formset.find('div:visible input[type="checkbox"]').last().attr('name'), "object_set-#{index}-check",
+        "the checkbox input's name has the id #{index} in it"
+      equal formset.find('div:visible label').last().attr('for'),
+        formset.find('div:visible input[type="checkbox"]').last().attr('id')
+        "the label's for attribute has the same value as the checkbox' id attribute"
+
+    formset = @fixtureDivWithForm.django_formset(prefix: 'object_set')
+    equal parseInt(@fixtureDivWithForm.find('input[name="object_set-TOTAL_FORMS"]').val()), 0,
+      "initially TOTAL_FORMS is 0"
+
+    formset.addForm()
+    checkFormIndex @fixtureDivWithForm, 0
+    formset.addForm()
+    checkFormIndex @fixtureDivWithForm, 1
+
 
   return
 ) jQuery
