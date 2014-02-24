@@ -10,6 +10,7 @@
       this.fixtureSimpleList = allFixtures.find('#simple-list');
       this.fixtureSimpleTable = allFixtures.find('#simple-table');
       this.fixtureDivWithForm = allFixtures.find('#div-with-form');
+      this.fixtureDivWithFormOneInitial = allFixtures.find('#div-with-form-one-initial');
     }
   });
   test("throws when jQuery selection is empty", function() {
@@ -121,6 +122,16 @@
     formset.addForm();
     formset.deleteForm(0);
     equal(this.fixtureDivWithForm.find("input[type='text']").last().attr('name'), 'object_set-0-text', "the text input that was at index 1 now has the name objects_set-0-text");
+  });
+  test("deletes initially existing form", function() {
+    var fixture, formset;
+    fixture = this.fixtureDivWithFormOneInitial;
+    formset = fixture.djangoFormset({
+      prefix: 'object_set'
+    });
+    formset.deleteForm(0);
+    equal(fixture.find("input[name='object_set-0-DELETE']").val(), "on");
+    equal(formset.forms[0].elem.is(':visible'), false);
   });
 })(jQuery);
 

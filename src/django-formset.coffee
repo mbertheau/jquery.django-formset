@@ -37,8 +37,8 @@ class FormsetError extends Error
 
       initialForms = base.children().not('.empty-form')
 
-      @forms = do => for form in base.children(':visible')
-        new $.fn.djangoFormset.Form(form, this)
+      @forms = base.children(':visible').map((index, element) =>
+        new $.fn.djangoFormset.Form($(element), this, index))
 
       @insertAnchor = base.children().last()
 
@@ -61,31 +61,32 @@ class FormsetError extends Error
     deleteForm: (index) ->
       form = @forms[index]
       form.delete()
-      @forms.splice(index, 1)
-      @_renumberFormIndexes()
       return
 
-    _renumberFormIndexes: ->
+    handleFormRemoved: (index) ->
+      @totalForms.val(parseInt(@totalForms.val()) - 1)
+      @forms.splice(index, 1)
       for form, i in @forms
         form.updateFormIndex(i)
 
   class $.fn.djangoFormset.Form
-    constructor: (@elem, @formset) ->
+    constructor: (@elem, @formset, @index) ->
 
-    delete: =>
-      deleteName = '#{@formset.prefix}-#{index}-DELETE'
-      deleteInput = @elem.find("input:hidden[name='#{deleteName}']").get(0)
-      isInitial = deleteInput?
+    delete: ->
+      deleteName = "#{@formset.prefix}-#{@index}-DELETE"
+      deleteInput = @elem.find("input[name='#{deleteName}']")
+      isInitial = deleteInput.get(0)?
 
       if isInitial
-        @_deleteInitial()
+        deleteInput.val('on')
+        @hide()
       else
-        @_deleteNew()
+        @elem.remove()
+        @formset.handleFormRemoved(@index)
       return
 
-    _deleteNew: ->
-      @elem.remove()
-      @formset.totalForms.val(parseInt(@formset.totalForms.val()) - 1)
+    hide: ->
+      @elem.hide()
 
     _replaceFormIndex: (oldIndexPattern, index) ->
       prefixRegex = new RegExp("^(id_)?#{@formset.prefix}-#{oldIndexPattern}")
@@ -106,6 +107,7 @@ class FormsetError extends Error
       @_replaceFormIndex("__prefix__", index)
 
     updateFormIndex: (index) ->
+      @index = index
       @_replaceFormIndex('\\d+', index)
 
 

@@ -1,7 +1,6 @@
 var FormsetError,
   __hasProp = {}.hasOwnProperty,
-  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
 FormsetError = (function(_super) {
   __extends(FormsetError, _super);
@@ -38,18 +37,11 @@ FormsetError = (function(_super) {
         throw new FormsetError("Can't find template (looking for .empty-form)");
       }
       initialForms = base.children().not('.empty-form');
-      this.forms = (function(_this) {
-        return function() {
-          var form, _i, _len, _ref, _results;
-          _ref = base.children(':visible');
-          _results = [];
-          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-            form = _ref[_i];
-            _results.push(new $.fn.djangoFormset.Form(form, _this));
-          }
-          return _results;
+      this.forms = base.children(':visible').map((function(_this) {
+        return function(index, element) {
+          return new $.fn.djangoFormset.Form($(element), _this, index);
         };
-      })(this)();
+      })(this));
       this.insertAnchor = base.children().last();
       return;
     }
@@ -69,12 +61,12 @@ FormsetError = (function(_super) {
       var form;
       form = this.forms[index];
       form["delete"]();
-      this.forms.splice(index, 1);
-      this._renumberFormIndexes();
     };
 
-    Formset.prototype._renumberFormIndexes = function() {
+    Formset.prototype.handleFormRemoved = function(index) {
       var form, i, _i, _len, _ref, _results;
+      this.totalForms.val(parseInt(this.totalForms.val()) - 1);
+      this.forms.splice(index, 1);
       _ref = this.forms;
       _results = [];
       for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
@@ -88,27 +80,28 @@ FormsetError = (function(_super) {
 
   })();
   $.fn.djangoFormset.Form = (function() {
-    function Form(elem, formset) {
+    function Form(elem, formset, index) {
       this.elem = elem;
       this.formset = formset;
-      this["delete"] = __bind(this["delete"], this);
+      this.index = index;
     }
 
     Form.prototype["delete"] = function() {
       var deleteInput, deleteName, isInitial;
-      deleteName = '#{@formset.prefix}-#{index}-DELETE';
-      deleteInput = this.elem.find("input:hidden[name='" + deleteName + "']").get(0);
-      isInitial = deleteInput != null;
+      deleteName = "" + this.formset.prefix + "-" + this.index + "-DELETE";
+      deleteInput = this.elem.find("input[name='" + deleteName + "']");
+      isInitial = deleteInput.get(0) != null;
       if (isInitial) {
-        this._deleteInitial();
+        deleteInput.val('on');
+        this.hide();
       } else {
-        this._deleteNew();
+        this.elem.remove();
+        this.formset.handleFormRemoved(this.index);
       }
     };
 
-    Form.prototype._deleteNew = function() {
-      this.elem.remove();
-      return this.formset.totalForms.val(parseInt(this.formset.totalForms.val()) - 1);
+    Form.prototype.hide = function() {
+      return this.elem.hide();
     };
 
     Form.prototype._replaceFormIndex = function(oldIndexPattern, index) {
@@ -136,6 +129,7 @@ FormsetError = (function(_super) {
     };
 
     Form.prototype.updateFormIndex = function(index) {
+      this.index = index;
       return this._replaceFormIndex('\\d+', index);
     };
 

@@ -59,6 +59,31 @@
         <input id="id_object_set-INITIAL_FORMS" name="object_set-INITIAL_FORMS" type="hidden" value="0"/>
         <input id="id_object_set-MAX_NUM_FORMS" name="object_set-MAX_NUM_FORMS" type="hidden" value="1000"/>
       </div>
+      <div id="div-with-form-one-initial">
+        <input id="id_object_set-TOTAL_FORMS" name="object_set-TOTAL_FORMS" type="hidden" value="1"/>
+        <div class="empty-form">
+          <input name="object_set-__prefix__-text" type="text"/>
+          <select name="object_set-__prefix__-select">
+            <option value="foo">foo</option>
+          </select>
+          <textarea name="object_set-__prefix__-textarea"></textarea>
+          <label for="id_object_set-__prefix__-checkbox">Check: </label>
+          <input id="id_object_set-__prefix__-checkbox" name="object_set-__prefix__-checkbox" type="checkbox"/>
+        </div>
+        <div>
+          <input name="object_set-0-text" type="text"/>
+          <select name="object_set-0-select">
+            <option value="foo">foo</option>
+          </select>
+          <textarea name="object_set-0-textarea"></textarea>
+          <label for="id_object_set-0-checkbox">Check: </label>
+          <input id="id_object_set-0-checkbox" name="object_set-0-checkbox" type="checkbox"/>
+          <label for="id_object_set-0-DELETE">Delete:</label>
+          <input id="id_object_set-0-DELETE" name="object_set-0-DELETE" type="checkbox">
+        </div>
+        <input id="id_object_set-INITIAL_FORMS" name="object_set-INITIAL_FORMS" type="hidden" value="1"/>
+        <input id="id_object_set-MAX_NUM_FORMS" name="object_set-MAX_NUM_FORMS" type="hidden" value="1000"/>
+      </div>
   </div>
 </body>
 </html>

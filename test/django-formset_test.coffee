@@ -31,6 +31,8 @@
       @fixtureSimpleList = allFixtures.find('#simple-list')
       @fixtureSimpleTable = allFixtures.find('#simple-table')
       @fixtureDivWithForm = allFixtures.find('#div-with-form')
+      @fixtureDivWithFormOneInitial = allFixtures.find(
+        '#div-with-form-one-initial')
       return
   )
 
@@ -177,6 +179,18 @@
     equal(@fixtureDivWithForm.find("input[type='text']").last().attr('name'),
       'object_set-0-text',
       "the text input that was at index 1 now has the name objects_set-0-text")
+
+    return
+  )
+
+  test("deletes initially existing form", ->
+    fixture = @fixtureDivWithFormOneInitial
+    formset = fixture.djangoFormset(prefix: 'object_set')
+
+    formset.deleteForm(0)
+
+    equal(fixture.find("input[name='object_set-0-DELETE']").val(), "on")
+    equal(formset.forms[0].elem.is(':visible'), false)
 
     return
   )
