@@ -68,7 +68,7 @@
     formset.addForm();
     checkFormIndex(this.fixtureDivWithForm, 0);
     formset.addForm();
-    return checkFormIndex(this.fixtureDivWithForm, 1);
+    checkFormIndex(this.fixtureDivWithForm, 1);
   });
 })(jQuery);
 

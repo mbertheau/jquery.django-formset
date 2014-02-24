@@ -52,6 +52,18 @@ module.exports = function(grunt) {
       test: {
         src: ['test/**/*.coffee']
       },
+      options: {
+        'arrow_spacing': {'level': 'error'},
+        'colon_assignment_spacing': {'level': 'error',
+                                     'spacing': {'left': 0, 'right': 1}},
+        'cyclomatic_complexity': {'level': 'error'},
+        'line_endings': {'level': 'error'},
+        'newlines_after_classes': {'level': 'error'},
+        'no_empty_param_list': {'level': 'error'},
+        'no_implicit_parens': {'level': 'error'},
+        'no_standalone_at': {'level': 'error'},
+        'space_operators': {'level': 'error'},
+      },
     },
     watch: {
       gruntfile: {
