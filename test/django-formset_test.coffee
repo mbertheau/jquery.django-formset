@@ -115,18 +115,25 @@
     checkFormIndex = (fixture, formset, index) ->
       equal(getTotalFormsValue(fixture, formset), index + 1,
         "after adding one form TOTAL_FORMS is #{index + 1}")
-      equal(fixture.find('div:visible input[type="text"]').last().attr('name'),
-        "object_set-#{index}-text",
-        "the text input's name has the id #{index} in it")
-      equal(fixture.find('div:visible select').last().attr('name'),
-        "object_set-#{index}-select",
-        "the select's name has the id #{index} in it")
-      equal(fixture.find('div:visible textarea').last().attr('name'),
-        "object_set-#{index}-textarea",
-        "the textarea's name has the id #{index} in it")
-      equal(fixture.find('div:visible input[type="checkbox"]')
-                   .last().attr('name'), "object_set-#{index}-check",
-        "the checkbox input's name has the id #{index} in it")
+
+      types_and_selectors = {
+        select: 'select'
+        textarea: 'textarea'
+        text: 'input[type="text"]'
+        checkbox: 'input[type="checkbox"]'
+      }
+      for type, selector of types_and_selectors
+        element = fixture.find("div:visible #{selector}").last()
+        nameValue = element.attr('name')
+        idValue = element.attr('id')
+
+        equal(nameValue, "object_set-#{index}-#{type}",
+          "the #{type}'s name has the id #{index} in it")
+
+        if idValue isnt undefined
+          equal(idValue, "id_#{nameValue}",
+            "the #{type}'s id value is the same as name with id_ prefix")
+
       equal(fixture.find('div:visible label').last().attr('for'),
         fixture.find('div:visible input[type="checkbox"]').last().attr('id')
         "the label's for attribute has the same value as the checkbox' id

@@ -57,12 +57,12 @@ FormsetError = (function(_super) {
     Formset.prototype.addForm = function() {
       var newForm, newFormElem;
       newFormElem = this.template.clone().removeClass("empty-form");
+      newForm = new $.fn.djangoFormset.Form(newFormElem, this);
+      newForm.initFormIndex(this.totalForms.val());
+      this.totalForms.val(parseInt(this.totalForms.val()) + 1);
       newFormElem.insertAfter(this.insertAnchor);
       this.insertAnchor = newFormElem;
-      newForm = new $.fn.djangoFormset.Form(newFormElem, this);
       this.forms.push(newForm);
-      this.totalForms.val(parseInt(this.totalForms.val()) + 1);
-      newForm.initFormIndex(this.totalForms.val() - 1);
     };
 
     Formset.prototype.deleteForm = function(index) {
@@ -113,17 +113,20 @@ FormsetError = (function(_super) {
 
     Form.prototype._replaceFormIndex = function(oldIndexPattern, index) {
       var newPrefix, prefixRegex;
-      prefixRegex = new RegExp("^" + this.formset.prefix + "-" + oldIndexPattern);
+      prefixRegex = new RegExp("^(id_)?" + this.formset.prefix + "-" + oldIndexPattern);
       newPrefix = "" + this.formset.prefix + "-" + index;
       return this.elem.find('input,select,textarea,label').each(function() {
         var attributeName, elem, _i, _len, _ref;
         elem = $(this);
-        _ref = ['for', 'id', 'name'];
+        _ref = ['for', 'id'];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           attributeName = _ref[_i];
           if (elem.attr(attributeName)) {
-            elem.attr(attributeName, elem.attr(attributeName).replace(prefixRegex, newPrefix));
+            elem.attr(attributeName, elem.attr(attributeName).replace(prefixRegex, "id_" + newPrefix));
           }
+        }
+        if (elem.attr('name')) {
+          elem.attr('name', elem.attr('name').replace(prefixRegex, newPrefix));
         }
       });
     };

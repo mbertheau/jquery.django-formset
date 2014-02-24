@@ -46,14 +46,16 @@ class FormsetError extends Error
 
     addForm: ->
       newFormElem = @template.clone().removeClass("empty-form")
-      newFormElem.insertAfter(@insertAnchor)
-      @insertAnchor = newFormElem
+
       newForm = new $.fn.djangoFormset.Form(newFormElem, this)
-      @forms.push(newForm)
+      newForm.initFormIndex(@totalForms.val())
       @totalForms.val(parseInt(@totalForms.val()) + 1)
 
+      newFormElem.insertAfter(@insertAnchor)
+      @insertAnchor = newFormElem
+      @forms.push(newForm)
+
       # form indices start at 0
-      newForm.initFormIndex(@totalForms.val() - 1)
       return
 
     deleteForm: (index) ->
@@ -86,13 +88,17 @@ class FormsetError extends Error
       @formset.totalForms.val(parseInt(@formset.totalForms.val()) - 1)
 
     _replaceFormIndex: (oldIndexPattern, index) ->
-      prefixRegex = new RegExp("^#{@formset.prefix}-#{oldIndexPattern}")
+      prefixRegex = new RegExp("^(id_)?#{@formset.prefix}-#{oldIndexPattern}")
       newPrefix = "#{@formset.prefix}-#{index}"
       @elem.find('input,select,textarea,label').each(->
         elem = $(this)
-        for attributeName in ['for', 'id', 'name'] when elem.attr(attributeName)
+        for attributeName in ['for', 'id'] when elem.attr(attributeName)
           elem.attr(attributeName,
-                    elem.attr(attributeName).replace(prefixRegex, newPrefix))
+                    elem.attr(attributeName).replace(prefixRegex,
+                                                     "id_#{newPrefix}"))
+        if elem.attr('name')
+          elem.attr('name',
+                    elem.attr('name').replace(prefixRegex, newPrefix))
         return
       )
 
