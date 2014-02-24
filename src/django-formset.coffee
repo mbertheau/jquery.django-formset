@@ -12,27 +12,39 @@ class FormsetError extends Error
 
   # Collection method.
   $.fn.djangoFormset = (options) ->
+    new $.fn.djangoFormset.Formset(this, options)
 
-    @opts = $.extend({}, $.fn.djangoFormset.default_options, options)
+  class $.fn.djangoFormset.Formset
+    constructor: (base, options) ->
+      opts = $.extend({}, $.fn.djangoFormset.default_options, options)
+      @prefix = opts.prefix
 
-    base = this
+      if base.length == 0
+        throw new FormsetError("Empty selector.")
 
-    if base.length == 0
-      throw new FormsetError("Empty selector.")
+      @totalForms = base.find("#id_#{@prefix}-TOTAL_FORMS")
+      if @totalForms.length == 0
+        throw new FormsetError("Management form field 'TOTAL_FORMS' not found
+                                for prefix #{@prefix}.")
 
-    totalForms = base.find("#id_#{@opts.prefix}-TOTAL_FORMS")
-    if totalForms.length == 0
-      throw new FormsetError("Management form field 'TOTAL_FORMS' not found for
-                              prefix #{@opts.prefix}.")
+      if base.prop("tagName") == "TABLE"
+        base = base.children("tbody")
 
-    if @prop("tagName") == "TABLE"
-      base = @children("tbody")
+      @template = base.children(".empty-form")
 
-    template = base.find("> .empty-form")
+      if @template.length == 0
+        throw new FormsetError("Can't find template (looking for .empty-form)")
 
-    lastForm = base.children().last()
+      initialForms = base.children().not('.empty-form')
 
-    setFormIndex = (form, index) ->
+      @forms = do => for form in base.children(':visible')
+        new $.fn.djangoFormset.Form(form, this)
+
+      @insertAnchor = base.children().last()
+
+      return
+
+    _setFormIndex: (form, index) ->
       form.find('input,select,textarea,label').each(->
         elem = $(this)
         for attributeName in ['for', 'id', 'name'] when elem.attr(attributeName)
@@ -42,14 +54,39 @@ class FormsetError extends Error
       )
 
     addForm: ->
-      newForm = template.clone().removeClass("empty-form")
-      newForm.insertAfter(lastForm)
-      totalForms.val(parseInt(totalForms.val()) + 1)
+      newForm = @template.clone().removeClass("empty-form")
+      newForm.insertAfter(@insertAnchor)
+      @insertAnchor = newForm
+      @forms.push(new $.fn.djangoFormset.Form(newForm, this))
+      @totalForms.val(parseInt(@totalForms.val()) + 1)
 
       # form indices start at 0
-      setFormIndex(newForm, totalForms.val() - 1)
-      lastForm = newForm
+      @_setFormIndex(newForm, @totalForms.val() - 1)
       return
+
+    deleteForm: (index) ->
+      form = @forms[index]
+      form.delete()
+      @forms = @forms[..index].concat(@forms[index + 1..])
+      return
+
+  class $.fn.djangoFormset.Form
+    constructor: (@elem, @formset) ->
+
+    delete: =>
+      deleteName = '#{@formset.prefix}-#{index}-DELETE'
+      deleteInput = @elem.find("input:hidden[name='#{deleteName}']").get(0)
+      isInitial = deleteInput?
+
+      if isInitial
+        @_deleteInitial()
+      else
+        @_deleteNew()
+      return
+
+    _deleteNew: ->
+      @elem.remove()
+      @formset.totalForms.val(parseInt(@formset.totalForms.val()) - 1)
 
   $.fn.djangoFormset.default_options =
     prefix: "form"
