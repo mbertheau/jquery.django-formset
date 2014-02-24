@@ -20,7 +20,7 @@
   #      notStrictEqual(actual, expected, [message])
   #      throws(block, [expected], [message])
   #
-  module "jQuery#django_formset",
+  module "jQuery#djangoFormset",
 
     # This will run before each test in this module.
     setup: ->
@@ -32,13 +32,13 @@
       return
 
   test "throws on missing TOTAL_FORMS", ->
-    throws (-> @fixtureNoTotalForms.django_formset(prefix: 'no-total-forms')),
+    throws (-> @fixtureNoTotalForms.djangoFormset(prefix: 'no-total-forms')),
       /Management form field 'TOTAL_FORMS' not found for prefix no-total-forms/,
       "throws Error"
     return
 
   test "can add form", ->
-    formset = @fixtureSimpleList.django_formset(prefix: 'simple-list')
+    formset = @fixtureSimpleList.djangoFormset(prefix: 'simple-list')
 
     equal @fixtureSimpleList.find(".empty-form").length, 1, "there's exactly one template form"
     equal @fixtureSimpleList.find(":visible").length, 3, "and three visible templates"
@@ -51,7 +51,7 @@
     return
 
   test "adds form at the end", ->
-    formset = @fixtureSimpleList.django_formset(prefix: 'simple-list')
+    formset = @fixtureSimpleList.djangoFormset(prefix: 'simple-list')
     equal @fixtureSimpleList.find(":visible:last-child").text(), "awesome test markup",
       "just checking current last form"
 
@@ -72,7 +72,7 @@
     return
 
   test "adds forms to tables as new rows", ->
-    formset = @fixtureSimpleTable.django_formset(prefix: 'simple-table')
+    formset = @fixtureSimpleTable.djangoFormset(prefix: 'simple-table')
     equal @fixtureSimpleTable.find('tbody > tr:visible').length, 0, "no forms there initially"
 
     formset.addForm()
@@ -96,7 +96,7 @@
         formset.find('div:visible input[type="checkbox"]').last().attr('id')
         "the label's for attribute has the same value as the checkbox' id attribute"
 
-    formset = @fixtureDivWithForm.django_formset(prefix: 'object_set')
+    formset = @fixtureDivWithForm.djangoFormset(prefix: 'object_set')
     equal parseInt(@fixtureDivWithForm.find('input[name="object_set-TOTAL_FORMS"]').val()), 0,
       "initially TOTAL_FORMS is 0"
 

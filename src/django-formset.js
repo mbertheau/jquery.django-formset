@@ -1,20 +1,22 @@
-var __hasProp = {}.hasOwnProperty,
+var FormsetError,
+  __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
+FormsetError = (function(_super) {
+  __extends(FormsetError, _super);
+
+  function FormsetError() {
+    return FormsetError.__super__.constructor.apply(this, arguments);
+  }
+
+  return FormsetError;
+
+})(Error);
+
 (function($) {
-  $.fn.django_formset = function(options) {
-    var FormsetError, base, lastForm, setFormIndex, template, totalForms;
-    FormsetError = (function(_super) {
-      __extends(FormsetError, _super);
-
-      function FormsetError() {
-        return FormsetError.__super__.constructor.apply(this, arguments);
-      }
-
-      return FormsetError;
-
-    })(Error);
-    this.opts = $.extend({}, $.fn.django_formset.default_options, options);
+  $.fn.djangoFormset = function(options) {
+    var base, lastForm, setFormIndex, template, totalForms;
+    this.opts = $.extend({}, $.fn.djangoFormset.default_options, options);
     base = this;
     totalForms = base.find("#id_" + this.opts.prefix + "-TOTAL_FORMS");
     if (totalForms.length === 0) {
@@ -49,7 +51,7 @@ var __hasProp = {}.hasOwnProperty,
       }
     };
   };
-  $.fn.django_formset.default_options = {
+  $.fn.djangoFormset.default_options = {
     prefix: "form"
   };
 })(jQuery);

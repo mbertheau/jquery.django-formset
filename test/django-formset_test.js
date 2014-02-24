@@ -1,5 +1,5 @@
 (function($) {
-  module("jQuery#django_formset", {
+  module("jQuery#djangoFormset", {
     setup: function() {
       var allFixtures;
       allFixtures = $("#qunit-fixture");
@@ -11,14 +11,14 @@
   });
   test("throws on missing TOTAL_FORMS", function() {
     throws((function() {
-      return this.fixtureNoTotalForms.django_formset({
+      return this.fixtureNoTotalForms.djangoFormset({
         prefix: 'no-total-forms'
       });
     }), /Management form field 'TOTAL_FORMS' not found for prefix no-total-forms/, "throws Error");
   });
   test("can add form", function() {
     var formset;
-    formset = this.fixtureSimpleList.django_formset({
+    formset = this.fixtureSimpleList.djangoFormset({
       prefix: 'simple-list'
     });
     equal(this.fixtureSimpleList.find(".empty-form").length, 1, "there's exactly one template form");
@@ -29,7 +29,7 @@
   });
   test("adds form at the end", function() {
     var formset, lastChild;
-    formset = this.fixtureSimpleList.django_formset({
+    formset = this.fixtureSimpleList.djangoFormset({
       prefix: 'simple-list'
     });
     equal(this.fixtureSimpleList.find(":visible:last-child").text(), "awesome test markup", "just checking current last form");
@@ -44,7 +44,7 @@
   });
   test("adds forms to tables as new rows", function() {
     var formset;
-    formset = this.fixtureSimpleTable.django_formset({
+    formset = this.fixtureSimpleTable.djangoFormset({
       prefix: 'simple-table'
     });
     equal(this.fixtureSimpleTable.find('tbody > tr:visible').length, 0, "no forms there initially");
@@ -61,7 +61,7 @@
       equal(formset.find('div:visible input[type="checkbox"]').last().attr('name'), "object_set-" + index + "-check", "the checkbox input's name has the id " + index + " in it");
       return equal(formset.find('div:visible label').last().attr('for'), formset.find('div:visible input[type="checkbox"]').last().attr('id'), "the label's for attribute has the same value as the checkbox' id attribute");
     };
-    formset = this.fixtureDivWithForm.django_formset({
+    formset = this.fixtureDivWithForm.djangoFormset({
       prefix: 'object_set'
     });
     equal(parseInt(this.fixtureDivWithForm.find('input[name="object_set-TOTAL_FORMS"]').val()), 0, "initially TOTAL_FORMS is 0");

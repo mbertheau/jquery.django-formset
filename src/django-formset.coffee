@@ -5,13 +5,15 @@
 # * Copyright (c) 2014 Markus Bertheau
 # * Licensed under the MIT license.
 #
+
+class FormsetError extends Error
+
 (($) ->
 
   # Collection method.
-  $.fn.django_formset = (options) ->
-    class FormsetError extends Error
+  $.fn.djangoFormset = (options) ->
 
-    @opts = $.extend {}, $.fn.django_formset.default_options, options
+    @opts = $.extend {}, $.fn.djangoFormset.default_options, options
 
     base = this
 
@@ -43,7 +45,7 @@
       lastForm = newForm
       return
 
-  $.fn.django_formset.default_options =
+  $.fn.djangoFormset.default_options =
     prefix: "form"
 
   return
