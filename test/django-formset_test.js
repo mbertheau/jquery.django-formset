@@ -99,6 +99,16 @@
     equal(this.fixtureDivWithForm.children('div:visible').length, 0, "the added form was deleted again");
     equal(getTotalFormsValue(this.fixtureDivWithForm, formset), 0, "TOTAL_FORMS is back to 0 again");
   });
+  test("renumbers when deleting newly added row from the middle", function() {
+    var formset;
+    formset = this.fixtureDivWithForm.djangoFormset({
+      prefix: 'object_set'
+    });
+    formset.addForm();
+    formset.addForm();
+    formset.deleteForm(0);
+    equal(this.fixtureDivWithForm.find("input[type='text']").last().attr('name'), 'object_set-0-text', "the text input that was at index 1 now has the name objects_set-0-text");
+  });
 })(jQuery);
 
 //# sourceMappingURL=django-formset_test.js.map

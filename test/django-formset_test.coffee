@@ -160,5 +160,19 @@
     return
   )
 
+  test("renumbers when deleting newly added row from the middle", ->
+    formset = @fixtureDivWithForm.djangoFormset(prefix: 'object_set')
+
+    formset.addForm()
+    formset.addForm()
+    formset.deleteForm(0)
+
+    equal(@fixtureDivWithForm.find("input[type='text']").last().attr('name'),
+      'object_set-0-text',
+      "the text input that was at index 1 now has the name objects_set-0-text")
+
+    return
+  )
+
   return
 )(jQuery)

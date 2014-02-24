@@ -57,35 +57,34 @@ FormsetError = (function(_super) {
       return;
     }
 
-    Formset.prototype._setFormIndex = function(form, index) {
-      return form.find('input,select,textarea,label').each(function() {
-        var attributeName, elem, _i, _len, _ref;
-        elem = $(this);
-        _ref = ['for', 'id', 'name'];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          attributeName = _ref[_i];
-          if (elem.attr(attributeName)) {
-            elem.attr(attributeName, elem.attr(attributeName).replace('__prefix__', index));
-          }
-        }
-      });
-    };
-
     Formset.prototype.addForm = function() {
-      var newForm;
-      newForm = this.template.clone().removeClass("empty-form");
-      newForm.insertAfter(this.insertAnchor);
-      this.insertAnchor = newForm;
-      this.forms.push(new $.fn.djangoFormset.Form(newForm, this));
+      var newForm, newFormElem;
+      newFormElem = this.template.clone().removeClass("empty-form");
+      newFormElem.insertAfter(this.insertAnchor);
+      this.insertAnchor = newFormElem;
+      newForm = new $.fn.djangoFormset.Form(newFormElem, this);
+      this.forms.push(newForm);
       this.totalForms.val(parseInt(this.totalForms.val()) + 1);
-      this._setFormIndex(newForm, this.totalForms.val() - 1);
+      newForm.initFormIndex(this.totalForms.val() - 1);
     };
 
     Formset.prototype.deleteForm = function(index) {
       var form;
       form = this.forms[index];
       form["delete"]();
-      this.forms = this.forms.slice(0, +index + 1 || 9e9).concat(this.forms.slice(index + 1));
+      this.forms.splice(index, 1);
+      this._renumberFormIndexes();
+    };
+
+    Formset.prototype._renumberFormIndexes = function() {
+      var form, i, _i, _len, _ref, _results;
+      _ref = this.forms;
+      _results = [];
+      for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
+        form = _ref[i];
+        _results.push(form.updateFormIndex(i));
+      }
+      return _results;
     };
 
     return Formset;
@@ -113,6 +112,31 @@ FormsetError = (function(_super) {
     Form.prototype._deleteNew = function() {
       this.elem.remove();
       return this.formset.totalForms.val(parseInt(this.formset.totalForms.val()) - 1);
+    };
+
+    Form.prototype._replaceFormIndex = function(oldIndexPattern, index) {
+      var newPrefix, prefixRegex;
+      prefixRegex = new RegExp("^" + this.formset.prefix + "-" + oldIndexPattern);
+      newPrefix = "" + this.formset.prefix + "-" + index;
+      return this.elem.find('input,select,textarea,label').each(function() {
+        var attributeName, elem, _i, _len, _ref;
+        elem = $(this);
+        _ref = ['for', 'id', 'name'];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          attributeName = _ref[_i];
+          if (elem.attr(attributeName)) {
+            elem.attr(attributeName, elem.attr(attributeName).replace(prefixRegex, newPrefix));
+          }
+        }
+      });
+    };
+
+    Form.prototype.initFormIndex = function(index) {
+      return this._replaceFormIndex("__prefix__", index);
+    };
+
+    Form.prototype.updateFormIndex = function(index) {
+      return this._replaceFormIndex('\\d+', index);
     };
 
     return Form;

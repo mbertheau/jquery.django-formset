@@ -44,31 +44,28 @@ class FormsetError extends Error
 
       return
 
-    _setFormIndex: (form, index) ->
-      form.find('input,select,textarea,label').each(->
-        elem = $(this)
-        for attributeName in ['for', 'id', 'name'] when elem.attr(attributeName)
-          elem.attr(attributeName,
-                    elem.attr(attributeName).replace('__prefix__', index))
-        return
-      )
-
     addForm: ->
-      newForm = @template.clone().removeClass("empty-form")
-      newForm.insertAfter(@insertAnchor)
-      @insertAnchor = newForm
-      @forms.push(new $.fn.djangoFormset.Form(newForm, this))
+      newFormElem = @template.clone().removeClass("empty-form")
+      newFormElem.insertAfter(@insertAnchor)
+      @insertAnchor = newFormElem
+      newForm = new $.fn.djangoFormset.Form(newFormElem, this)
+      @forms.push(newForm)
       @totalForms.val(parseInt(@totalForms.val()) + 1)
 
       # form indices start at 0
-      @_setFormIndex(newForm, @totalForms.val() - 1)
+      newForm.initFormIndex(@totalForms.val() - 1)
       return
 
     deleteForm: (index) ->
       form = @forms[index]
       form.delete()
-      @forms = @forms[..index].concat(@forms[index + 1..])
+      @forms.splice(index, 1)
+      @_renumberFormIndexes()
       return
+
+    _renumberFormIndexes: ->
+      for form, i in @forms
+        form.updateFormIndex(i)
 
   class $.fn.djangoFormset.Form
     constructor: (@elem, @formset) ->
@@ -87,6 +84,24 @@ class FormsetError extends Error
     _deleteNew: ->
       @elem.remove()
       @formset.totalForms.val(parseInt(@formset.totalForms.val()) - 1)
+
+    _replaceFormIndex: (oldIndexPattern, index) ->
+      prefixRegex = new RegExp("^#{@formset.prefix}-#{oldIndexPattern}")
+      newPrefix = "#{@formset.prefix}-#{index}"
+      @elem.find('input,select,textarea,label').each(->
+        elem = $(this)
+        for attributeName in ['for', 'id', 'name'] when elem.attr(attributeName)
+          elem.attr(attributeName,
+                    elem.attr(attributeName).replace(prefixRegex, newPrefix))
+        return
+      )
+
+    initFormIndex: (index) ->
+      @_replaceFormIndex("__prefix__", index)
+
+    updateFormIndex: (index) ->
+      @_replaceFormIndex('\\d+', index)
+
 
   $.fn.djangoFormset.default_options =
     prefix: "form"
