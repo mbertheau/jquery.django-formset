@@ -1,9 +1,25 @@
+var __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
 (function($) {
   $.fn.django_formset = function(options) {
-    var base, lastForm, setFormIndex, template, totalForms;
+    var FormsetError, base, lastForm, setFormIndex, template, totalForms;
+    FormsetError = (function(_super) {
+      __extends(FormsetError, _super);
+
+      function FormsetError() {
+        return FormsetError.__super__.constructor.apply(this, arguments);
+      }
+
+      return FormsetError;
+
+    })(Error);
     this.opts = $.extend({}, $.fn.django_formset.default_options, options);
     base = this;
     totalForms = base.find("#id_" + this.opts.prefix + "-TOTAL_FORMS");
+    if (totalForms.length === 0) {
+      throw new FormsetError("Management form field 'TOTAL_FORMS' not found for prefix " + this.opts.prefix + ".");
+    }
     if (this.prop("tagName") === "TABLE") {
       base = this.children("tbody");
     }

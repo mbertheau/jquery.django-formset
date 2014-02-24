@@ -25,13 +25,20 @@
     # This will run before each test in this module.
     setup: ->
       allFixtures = $("#qunit-fixture")
+      @fixtureNoTotalForms = allFixtures.find '#no-total-forms'
       @fixtureSimpleList = allFixtures.find '#simple-list'
       @fixtureSimpleTable = allFixtures.find '#simple-table'
       @fixtureDivWithForm = allFixtures.find '#div-with-form'
       return
 
+  test "throws on missing TOTAL_FORMS", ->
+    throws (-> @fixtureNoTotalForms.django_formset(prefix: 'no-total-forms')),
+      /Management form field 'TOTAL_FORMS' not found for prefix no-total-forms/,
+      "throws Error"
+    return
+
   test "can add form", ->
-    formset = @fixtureSimpleList.django_formset()
+    formset = @fixtureSimpleList.django_formset(prefix: 'simple-list')
 
     equal @fixtureSimpleList.find(".empty-form").length, 1, "there's exactly one template form"
     equal @fixtureSimpleList.find(":visible").length, 3, "and three visible templates"
@@ -44,7 +51,7 @@
     return
 
   test "adds form at the end", ->
-    formset = @fixtureSimpleList.django_formset()
+    formset = @fixtureSimpleList.django_formset(prefix: 'simple-list')
     equal @fixtureSimpleList.find(":visible:last-child").text(), "awesome test markup",
       "just checking current last form"
 
@@ -65,7 +72,7 @@
     return
 
   test "adds forms to tables as new rows", ->
-    formset = @fixtureSimpleTable.django_formset()
+    formset = @fixtureSimpleTable.django_formset(prefix: 'simple-table')
     equal @fixtureSimpleTable.find('tbody > tr:visible').length, 0, "no forms there initially"
 
     formset.addForm()
@@ -97,7 +104,6 @@
     checkFormIndex @fixtureDivWithForm, 0
     formset.addForm()
     checkFormIndex @fixtureDivWithForm, 1
-
 
   return
 ) jQuery

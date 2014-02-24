@@ -9,11 +9,15 @@
 
   # Collection method.
   $.fn.django_formset = (options) ->
+    class FormsetError extends Error
+
     @opts = $.extend {}, $.fn.django_formset.default_options, options
 
     base = this
 
     totalForms = base.find("#id_#{@opts.prefix}-TOTAL_FORMS")
+    if totalForms.length == 0
+      throw new FormsetError "Management form field 'TOTAL_FORMS' not found for prefix #{@opts.prefix}."
 
     if @prop("tagName") == "TABLE"
       base = @children("tbody")

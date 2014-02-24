@@ -3,14 +3,24 @@
     setup: function() {
       var allFixtures;
       allFixtures = $("#qunit-fixture");
+      this.fixtureNoTotalForms = allFixtures.find('#no-total-forms');
       this.fixtureSimpleList = allFixtures.find('#simple-list');
       this.fixtureSimpleTable = allFixtures.find('#simple-table');
       this.fixtureDivWithForm = allFixtures.find('#div-with-form');
     }
   });
+  test("throws on missing TOTAL_FORMS", function() {
+    throws((function() {
+      return this.fixtureNoTotalForms.django_formset({
+        prefix: 'no-total-forms'
+      });
+    }), /Management form field 'TOTAL_FORMS' not found for prefix no-total-forms/, "throws Error");
+  });
   test("can add form", function() {
     var formset;
-    formset = this.fixtureSimpleList.django_formset();
+    formset = this.fixtureSimpleList.django_formset({
+      prefix: 'simple-list'
+    });
     equal(this.fixtureSimpleList.find(".empty-form").length, 1, "there's exactly one template form");
     equal(this.fixtureSimpleList.find(":visible").length, 3, "and three visible templates");
     formset.addForm();
@@ -19,7 +29,9 @@
   });
   test("adds form at the end", function() {
     var formset, lastChild;
-    formset = this.fixtureSimpleList.django_formset();
+    formset = this.fixtureSimpleList.django_formset({
+      prefix: 'simple-list'
+    });
     equal(this.fixtureSimpleList.find(":visible:last-child").text(), "awesome test markup", "just checking current last form");
     formset.addForm();
     lastChild = this.fixtureSimpleList.find(":visible:last-child");
@@ -32,7 +44,9 @@
   });
   test("adds forms to tables as new rows", function() {
     var formset;
-    formset = this.fixtureSimpleTable.django_formset();
+    formset = this.fixtureSimpleTable.django_formset({
+      prefix: 'simple-table'
+    });
     equal(this.fixtureSimpleTable.find('tbody > tr:visible').length, 0, "no forms there initially");
     formset.addForm();
     equal(this.fixtureSimpleTable.find('tbody > tr:visible').length, 1, "one row was added");
