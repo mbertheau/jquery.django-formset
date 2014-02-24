@@ -18,6 +18,9 @@ FormsetError = (function(_super) {
     var base, lastForm, setFormIndex, template, totalForms;
     this.opts = $.extend({}, $.fn.djangoFormset.default_options, options);
     base = this;
+    if (base.length === 0) {
+      throw new FormsetError("Empty selector.");
+    }
     totalForms = base.find("#id_" + this.opts.prefix + "-TOTAL_FORMS");
     if (totalForms.length === 0) {
       throw new FormsetError("Management form field 'TOTAL_FORMS' not found for prefix " + this.opts.prefix + ".");

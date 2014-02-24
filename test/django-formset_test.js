@@ -3,11 +3,17 @@
     setup: function() {
       var allFixtures;
       allFixtures = $("#qunit-fixture");
+      this.fixtureIDontExist = allFixtures.find('#i-dont-exist');
       this.fixtureNoTotalForms = allFixtures.find('#no-total-forms');
       this.fixtureSimpleList = allFixtures.find('#simple-list');
       this.fixtureSimpleTable = allFixtures.find('#simple-table');
       this.fixtureDivWithForm = allFixtures.find('#div-with-form');
     }
+  });
+  test("throws when jQuery selection is empty", function() {
+    throws((function() {
+      return this.fixtureIDontExist.djangoFormset();
+    }), /Empty selector./, "throws Error");
   });
   test("throws on missing TOTAL_FORMS", function() {
     throws((function() {

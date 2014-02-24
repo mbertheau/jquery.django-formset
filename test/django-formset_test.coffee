@@ -25,11 +25,19 @@
     # This will run before each test in this module.
     setup: ->
       allFixtures = $("#qunit-fixture")
+      @fixtureIDontExist = allFixtures.find('#i-dont-exist')
       @fixtureNoTotalForms = allFixtures.find('#no-total-forms')
       @fixtureSimpleList = allFixtures.find('#simple-list')
       @fixtureSimpleTable = allFixtures.find('#simple-table')
       @fixtureDivWithForm = allFixtures.find('#div-with-form')
       return
+  )
+
+  test("throws when jQuery selection is empty", ->
+    throws((-> @fixtureIDontExist.djangoFormset()),
+      /Empty selector./,
+      "throws Error")
+    return
   )
 
   test("throws on missing TOTAL_FORMS", ->

@@ -17,6 +17,9 @@ class FormsetError extends Error
 
     base = this
 
+    if base.length == 0
+      throw new FormsetError("Empty selector.")
+
     totalForms = base.find("#id_#{@opts.prefix}-TOTAL_FORMS")
     if totalForms.length == 0
       throw new FormsetError("Management form field 'TOTAL_FORMS' not found for
