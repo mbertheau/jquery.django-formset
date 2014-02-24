@@ -44,17 +44,13 @@ module.exports = function(grunt) {
         },
         src: 'Gruntfile.js'
       },
+    },
+    coffeelint: {
       src: {
-        options: {
-          jshintrc: 'src/.jshintrc'
-        },
-        src: ['src/**/*.js']
+        src: ['src/**/*.coffee']
       },
       test: {
-        options: {
-          jshintrc: 'test/.jshintrc'
-        },
-        src: ['test/**/*.js']
+        src: ['test/**/*.coffee']
       },
     },
     watch: {
@@ -64,11 +60,11 @@ module.exports = function(grunt) {
       },
       src: {
         files: ['src/**/*.coffee'],
-        tasks: ['coffee:src', 'jshint:src', 'qunit', 'clean', 'concat', 'uglify']
+        tasks: ['coffee:src', 'coffeelint:src', 'qunit', 'clean', 'concat', 'uglify']
       },
       test: {
         files: ['test/**/*.coffee', 'test/django-formset.html'],
-        tasks: ['coffee:test', 'jshint:test', 'qunit', 'clean', 'concat', 'uglify']
+        tasks: ['coffee:test', 'coffeelint:test', 'qunit', 'clean', 'concat', 'uglify']
       },
     },
     coffee: {
@@ -97,8 +93,9 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-coffee');
+  grunt.loadNpmTasks('grunt-coffeelint');
 
   // Default task.
-  grunt.registerTask('default', ['coffee', 'jshint', 'qunit', 'clean', 'concat', 'uglify']);
+  grunt.registerTask('default', ['coffee', 'coffeelint', 'jshint', 'qunit', 'clean', 'concat', 'uglify']);
 
 };

@@ -19,7 +19,8 @@ class FormsetError extends Error
 
     totalForms = base.find("#id_#{@opts.prefix}-TOTAL_FORMS")
     if totalForms.length == 0
-      throw new FormsetError "Management form field 'TOTAL_FORMS' not found for prefix #{@opts.prefix}."
+      throw new FormsetError "Management form field 'TOTAL_FORMS' not found for
+                              prefix #{@opts.prefix}."
 
     if @prop("tagName") == "TABLE"
       base = @children("tbody")
@@ -32,7 +33,8 @@ class FormsetError extends Error
       form.find('input,select,textarea,label').each ->
         elem = $(this)
         for attributeName in ['for', 'id', 'name'] when elem.attr attributeName
-          elem.attr attributeName, elem.attr(attributeName).replace('__prefix__', index)
+          elem.attr(attributeName,
+                    elem.attr(attributeName).replace('__prefix__', index))
         return
 
     addForm: ->

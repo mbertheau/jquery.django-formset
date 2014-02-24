@@ -40,19 +40,24 @@
   test "can add form", ->
     formset = @fixtureSimpleList.djangoFormset(prefix: 'simple-list')
 
-    equal @fixtureSimpleList.find(".empty-form").length, 1, "there's exactly one template form"
-    equal @fixtureSimpleList.find(":visible").length, 3, "and three visible templates"
+    equal @fixtureSimpleList.find(".empty-form").length, 1,
+      "there's exactly one template form"
+    equal @fixtureSimpleList.find(":visible").length, 3,
+      "and three visible templates"
 
     formset.addForm()
 
-    equal @fixtureSimpleList.find(".empty-form").length, 1, "there's still exactly one template form"
-    equal @fixtureSimpleList.find(":visible").length, 4, "but now four visible templates"
+    equal @fixtureSimpleList.find(".empty-form").length, 1,
+      "there's still exactly one template form"
+    equal @fixtureSimpleList.find(":visible").length, 4,
+      "but now four visible templates"
 
     return
 
   test "adds form at the end", ->
     formset = @fixtureSimpleList.djangoFormset(prefix: 'simple-list')
-    equal @fixtureSimpleList.find(":visible:last-child").text(), "awesome test markup",
+    equal @fixtureSimpleList.find(":visible:last-child").text(),
+      "awesome test markup",
       "just checking current last form"
 
     formset.addForm()
@@ -73,31 +78,40 @@
 
   test "adds forms to tables as new rows", ->
     formset = @fixtureSimpleTable.djangoFormset(prefix: 'simple-table')
-    equal @fixtureSimpleTable.find('tbody > tr:visible').length, 0, "no forms there initially"
+    equal @fixtureSimpleTable.find('tbody > tr:visible').length, 0,
+      "no forms there initially"
 
     formset.addForm()
-    equal @fixtureSimpleTable.find('tbody > tr:visible').length, 1, "one row was added"
+    equal @fixtureSimpleTable.find('tbody > tr:visible').length, 1,
+      "one row was added"
 
     return
 
   test "replaces form index template and updates TOTAL_FORMS", ->
     checkFormIndex = (formset, index) ->
-      equal parseInt(formset.find('input[name="object_set-TOTAL_FORMS"]').val()), index + 1,
+      equal parseInt(formset.find('input[name="object_set-TOTAL_FORMS"]')
+                            .val()), index + 1,
         "after adding one form TOTAL_FORMS is #{index + 1}"
-      equal formset.find('div:visible input[type="text"]').last().attr('name'), "object_set-#{index}-text",
+      equal formset.find('div:visible input[type="text"]').last().attr('name'),
+        "object_set-#{index}-text",
         "the text input's name has the id #{index} in it"
-      equal formset.find('div:visible select').last().attr('name'), "object_set-#{index}-select",
+      equal formset.find('div:visible select').last().attr('name'),
+        "object_set-#{index}-select",
         "the select's name has the id #{index} in it"
-      equal formset.find('div:visible textarea').last().attr('name'), "object_set-#{index}-textarea",
+      equal formset.find('div:visible textarea').last().attr('name'),
+        "object_set-#{index}-textarea",
         "the textarea's name has the id #{index} in it"
-      equal formset.find('div:visible input[type="checkbox"]').last().attr('name'), "object_set-#{index}-check",
-        "the checkbox input's name has the id #{index} in it"
+      equal(formset.find('div:visible input[type="checkbox"]')
+                   .last().attr('name'), "object_set-#{index}-check",
+        "the checkbox input's name has the id #{index} in it")
       equal formset.find('div:visible label').last().attr('for'),
         formset.find('div:visible input[type="checkbox"]').last().attr('id')
-        "the label's for attribute has the same value as the checkbox' id attribute"
+        "the label's for attribute has the same value as the checkbox' id
+         attribute"
 
     formset = @fixtureDivWithForm.djangoFormset(prefix: 'object_set')
-    equal parseInt(@fixtureDivWithForm.find('input[name="object_set-TOTAL_FORMS"]').val()), 0,
+    equal parseInt(@fixtureDivWithForm
+                   .find('input[name="object_set-TOTAL_FORMS"]').val()), 0,
       "initially TOTAL_FORMS is 0"
 
     formset.addForm()
