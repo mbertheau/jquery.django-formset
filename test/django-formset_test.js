@@ -16,26 +16,26 @@
   });
   test("throws when jQuery selection is empty", function() {
     throws((function() {
-      return this.fixtureIDontExist.djangoFormset();
+      return this.fixtureIDontExist.children('li').djangoFormset();
     }), /Empty selector./, "throws Error");
   });
   test("throws on missing TOTAL_FORMS", function() {
     throws((function() {
-      return this.fixtureNoTotalForms.djangoFormset({
+      return this.fixtureNoTotalForms.children('li').djangoFormset({
         prefix: 'no-total-forms'
       });
     }), /Management form field 'TOTAL_FORMS' not found for prefix no-total-forms/, "throws Error");
   });
   test("throws on missing template", function() {
     throws((function() {
-      return this.fixtureNoTemplate.djangoFormset({
+      return this.fixtureNoTemplate.children('li').djangoFormset({
         prefix: 'no-template'
       });
     }), /Can\'t find template \(looking for .empty-form\)/, "throws Error");
   });
   test("can add form", function() {
     var formset;
-    formset = this.fixtureSimpleList.djangoFormset({
+    formset = this.fixtureSimpleList.children('li').djangoFormset({
       prefix: 'simple-list'
     });
     equal(this.fixtureSimpleList.find(".empty-form").length, 1, "there's exactly one template form");
@@ -46,7 +46,7 @@
   });
   test("adds form at the end", function() {
     var formset, lastChild;
-    formset = this.fixtureSimpleList.djangoFormset({
+    formset = this.fixtureSimpleList.children('li').djangoFormset({
       prefix: 'simple-list'
     });
     equal(this.fixtureSimpleList.find(":visible:last-child").text(), "awesome test markup", "just checking current last form");
@@ -61,7 +61,7 @@
   });
   test("adds forms to tables as new rows", function() {
     var formset;
-    formset = this.fixtureSimpleTable.djangoFormset({
+    formset = this.fixtureSimpleTable.children('tbody').children('tr').djangoFormset({
       prefix: 'simple-table'
     });
     equal(this.fixtureSimpleTable.find('tbody > tr:visible').length, 0, "no forms there initially");
@@ -87,17 +87,17 @@
         element = fixture.find("div:visible " + selector).last();
         nameValue = element.attr('name');
         idValue = element.attr('id');
-        equal(nameValue, "object_set-" + index + "-" + type, "the " + type + "'s name has the id " + index + " in it");
+        equal(nameValue, "" + formset.prefix + "-" + index + "-" + type, "the " + type + "'s name has the id " + index + " in it");
         if (idValue !== void 0) {
           equal(idValue, "id_" + nameValue, "the " + type + "'s id value is the same as name with id_ prefix");
         }
       }
       return equal(fixture.find('div:visible label').last().attr('for'), fixture.find('div:visible input[type="checkbox"]').last().attr('id'), "the label's for attribute has the same value as the checkbox' id attribute");
     };
-    formset = this.fixtureDivWithForm.djangoFormset({
-      prefix: 'object_set'
+    formset = this.fixtureDivWithForm.children('div').djangoFormset({
+      prefix: 'div-with-form'
     });
-    equal(parseInt(this.fixtureDivWithForm.find('input[name="object_set-TOTAL_FORMS"]').val()), 0, "initially TOTAL_FORMS is 0");
+    equal(parseInt(this.fixtureDivWithForm.find('input[name="div-with-form-TOTAL_FORMS"]').val()), 0, "initially TOTAL_FORMS is 0");
     formset.addForm();
     checkFormIndex(this.fixtureDivWithForm, formset, 0);
     formset.addForm();
@@ -105,8 +105,8 @@
   });
   test("deletes form that was added before", function() {
     var formset;
-    formset = this.fixtureDivWithForm.djangoFormset({
-      prefix: 'object_set'
+    formset = this.fixtureDivWithForm.children('div').djangoFormset({
+      prefix: 'div-with-form'
     });
     formset.addForm();
     equal(getTotalFormsValue(this.fixtureDivWithForm, formset), 1, "TOTAL_FORMS is 1 now");
@@ -116,56 +116,58 @@
   });
   test("renumbers when deleting newly added row from the middle", function() {
     var formset;
-    formset = this.fixtureDivWithForm.djangoFormset({
-      prefix: 'object_set'
+    formset = this.fixtureDivWithForm.children('div').djangoFormset({
+      prefix: 'div-with-form'
     });
     formset.addForm();
     formset.addForm();
     formset.deleteForm(0);
-    equal(this.fixtureDivWithForm.find("input[type='text']").last().attr('name'), 'object_set-0-text', "the text input that was at index 1 now has the name objects_set-0-text");
+    equal(this.fixtureDivWithForm.find("input[type='text']").last().attr('name'), 'div-with-form-0-text', "the text input that was at index 1 now has the name objects_set-0-text");
   });
   test("deletes initially existing form", function() {
     var fixture, formset;
     fixture = this.fixtureDivWithFormOneInitial;
-    formset = fixture.djangoFormset({
-      prefix: 'object_set'
+    formset = fixture.children('div').djangoFormset({
+      prefix: 'div-with-form-one-initial'
     });
     formset.deleteForm(0);
-    equal(fixture.find("input[name='object_set-0-DELETE']").val(), "on");
-    equal(formset.forms[0].elem.is(':visible'), false);
+    equal(fixture.find("input[name='div-with-form-one-initial-0-DELETE']").val(), "on", "delete checkbox is now checked");
+    equal(formset.forms[0].elem.is(':visible'), false, "removed form is now hidden");
   });
   test("replaces only first prefix when adding outer forms in nested formset", function() {
     var fixture, form, forms, formset, nestedEmptyForm, nestedInput;
     fixture = this.fixtureDivWithNestedFormsets;
-    formset = fixture.djangoFormset({
-      prefix: 'object_set'
+    formset = fixture.children('div').djangoFormset({
+      prefix: 'div-with-nested-formsets'
     });
     formset.addForm();
     forms = fixture.children('div:visible');
     equal(forms.length, 2, "there's two visible outer forms now");
     form = forms.last();
-    equal(form.find('input[type="text"]').first().attr('name'), "object_set-1-text", "outer form element has prefix correctly replaced in input name");
+    equal(form.find('input[type="text"]').first().attr('name'), "div-with-nested-formsets-1-outer", "outer form element has prefix correctly replaced in input name");
     nestedEmptyForm = form.find('.empty-form');
     equal(nestedEmptyForm.length, 1, "nested form template was copied as well");
-    nestedInput = nestedEmptyForm.find('input[type="checkbox"]');
-    equal(nestedInput.attr('name'), "object_set-1-variant_set-__prefix__-checkbox", "nested input in template has only first prefix replaced");
+    nestedInput = nestedEmptyForm.find('input[type="text"]');
+    equal(nestedInput.attr('name'), "div-with-nested-formsets-1-variant_set-__prefix__-inner", "nested input in template has only first prefix replaced");
   });
   test("addForm on added inner formset works", function() {
-    var fixture, formset, nestedForm, nestedFormset;
+    var fixture, form, formset, nestedForm, nestedFormset;
     fixture = this.fixtureDivWithNestedFormsets;
-    formset = fixture.djangoFormset({
-      prefix: 'object_set'
+    formset = fixture.children('div').djangoFormset({
+      prefix: 'div-with-nested-formsets'
     });
     nestedFormset = null;
     $(formset).on('formAdded', function(event, form) {
-      return nestedFormset = form.elem.djangoFormset({
+      return nestedFormset = form.elem.children('div').djangoFormset({
         prefix: "" + this.prefix + "-" + form.index + "-variant_set"
       });
     });
     formset.addForm();
+    form = fixture.children('div:visible').last();
+    equal(form.children('input[type="text"]').attr('name'), 'div-with-nested-formsets-1-outer', 'one form was added');
     nestedFormset.addForm();
-    nestedForm = fixture.children('div:visible').last().children('div:visible').last();
-    equal(nestedForm.find('input[type="checkbox"]').attr('name'), 'object_set-1-variant_set-0-checkbox');
+    nestedForm = form.children('div:visible').last();
+    equal(nestedForm.children('input[type="text"]').attr('name'), 'div-with-nested-formsets-1-variant_set-0-inner', 'added inner form input has the prefix replaced with the correct id');
   });
 })(jQuery);
 

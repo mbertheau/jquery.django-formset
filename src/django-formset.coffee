@@ -21,31 +21,28 @@ class FormsetError extends Error
       if base.length == 0
         throw new FormsetError("Empty selector.")
 
-      @totalForms = base.find("#id_#{@prefix}-TOTAL_FORMS")
+      @totalForms = $("#id_#{@prefix}-TOTAL_FORMS")
       if @totalForms.length == 0
         throw new FormsetError("Management form field 'TOTAL_FORMS' not found
                                 for prefix #{@prefix}.")
 
-      if base.prop("tagName") == "TABLE"
-        base = base.children("tbody")
-
-      @template = base.children(".empty-form")
+      @template = base.filter(".empty-form")
 
       if @template.length == 0
         throw new FormsetError("Can't find template (looking for .empty-form)")
 
-      initialForms = base.children().not('.empty-form')
+      initialForms = base.not('.empty-form')
 
-      @forms = base.children(':visible').map((index, element) =>
+      @forms = base.filter(':visible').map((index, element) =>
         new $.fn.djangoFormset.Form($(element), this, index))
 
-      console.log("@forms.length: #{@forms.length}")
-      console.log("@totalForms.val(): #{@totalForms.val()}")
       if @forms.length != parseInt(@totalForms.val())
-        console.warn("TOTAL_FORMS is #{@totalForms.val()}, but #{@forms.length}
+        console.error("TOTAL_FORMS is #{@totalForms.val()}, but #{@forms.length}
                       visible children found.")
 
-      @insertAnchor = base.children().last()
+      @insertAnchor = base.filter(':visible').last()
+      if @insertAnchor.length == 0
+        @insertAnchor = @template
 
       return
 

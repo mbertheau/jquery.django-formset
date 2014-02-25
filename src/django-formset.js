@@ -25,29 +25,27 @@ FormsetError = (function(_super) {
       if (base.length === 0) {
         throw new FormsetError("Empty selector.");
       }
-      this.totalForms = base.find("#id_" + this.prefix + "-TOTAL_FORMS");
+      this.totalForms = $("#id_" + this.prefix + "-TOTAL_FORMS");
       if (this.totalForms.length === 0) {
         throw new FormsetError("Management form field 'TOTAL_FORMS' not found for prefix " + this.prefix + ".");
       }
-      if (base.prop("tagName") === "TABLE") {
-        base = base.children("tbody");
-      }
-      this.template = base.children(".empty-form");
+      this.template = base.filter(".empty-form");
       if (this.template.length === 0) {
         throw new FormsetError("Can't find template (looking for .empty-form)");
       }
-      initialForms = base.children().not('.empty-form');
-      this.forms = base.children(':visible').map((function(_this) {
+      initialForms = base.not('.empty-form');
+      this.forms = base.filter(':visible').map((function(_this) {
         return function(index, element) {
           return new $.fn.djangoFormset.Form($(element), _this, index);
         };
       })(this));
-      console.log("@forms.length: " + this.forms.length);
-      console.log("@totalForms.val(): " + (this.totalForms.val()));
       if (this.forms.length !== parseInt(this.totalForms.val())) {
-        console.warn("TOTAL_FORMS is " + (this.totalForms.val()) + ", but " + this.forms.length + " visible children found.");
+        console.error("TOTAL_FORMS is " + (this.totalForms.val()) + ", but " + this.forms.length + " visible children found.");
       }
-      this.insertAnchor = base.children().last();
+      this.insertAnchor = base.filter(':visible').last();
+      if (this.insertAnchor.length === 0) {
+        this.insertAnchor = this.template;
+      }
       return;
     }
 

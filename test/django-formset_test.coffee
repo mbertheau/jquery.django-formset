@@ -39,28 +39,33 @@
   )
 
   test("throws when jQuery selection is empty", ->
-    throws((-> @fixtureIDontExist.djangoFormset()),
+    throws((-> @fixtureIDontExist.children('li').djangoFormset()),
       /Empty selector./,
       "throws Error")
     return
   )
 
   test("throws on missing TOTAL_FORMS", ->
-    throws((-> @fixtureNoTotalForms.djangoFormset(prefix: 'no-total-forms')),
+    throws((->
+      @fixtureNoTotalForms.children('li')
+        .djangoFormset(prefix: 'no-total-forms')),
       /Management form field 'TOTAL_FORMS' not found for prefix no-total-forms/,
       "throws Error")
     return
   )
 
   test("throws on missing template", ->
-    throws((-> @fixtureNoTemplate.djangoFormset(prefix: 'no-template')),
+    throws((->
+      @fixtureNoTemplate.children('li')
+        .djangoFormset(prefix: 'no-template')),
       /Can\'t find template \(looking for .empty-form\)/
       "throws Error")
     return
   )
 
   test("can add form", ->
-    formset = @fixtureSimpleList.djangoFormset(prefix: 'simple-list')
+    formset = @fixtureSimpleList.children('li')
+      .djangoFormset(prefix: 'simple-list')
 
     equal(@fixtureSimpleList.find(".empty-form").length, 1,
       "there's exactly one template form")
@@ -78,7 +83,8 @@
   )
 
   test("adds form at the end", ->
-    formset = @fixtureSimpleList.djangoFormset(prefix: 'simple-list')
+    formset = @fixtureSimpleList.children('li')
+      .djangoFormset(prefix: 'simple-list')
     equal(@fixtureSimpleList.find(":visible:last-child").text(),
       "awesome test markup",
       "just checking current last form")
@@ -101,7 +107,8 @@
   )
 
   test("adds forms to tables as new rows", ->
-    formset = @fixtureSimpleTable.djangoFormset(prefix: 'simple-table')
+    formset = @fixtureSimpleTable.children('tbody').children('tr')
+      .djangoFormset(prefix: 'simple-table')
     equal(@fixtureSimpleTable.find('tbody > tr:visible').length, 0,
       "no forms there initially")
 
@@ -131,7 +138,7 @@
         nameValue = element.attr('name')
         idValue = element.attr('id')
 
-        equal(nameValue, "object_set-#{index}-#{type}",
+        equal(nameValue, "#{formset.prefix}-#{index}-#{type}",
           "the #{type}'s name has the id #{index} in it")
 
         if idValue isnt undefined
@@ -143,9 +150,10 @@
         "the label's for attribute has the same value as the checkbox' id
          attribute")
 
-    formset = @fixtureDivWithForm.djangoFormset(prefix: 'object_set')
+    formset = @fixtureDivWithForm.children('div')
+      .djangoFormset(prefix: 'div-with-form')
     equal(parseInt(@fixtureDivWithForm
-                   .find('input[name="object_set-TOTAL_FORMS"]').val()), 0,
+                   .find('input[name="div-with-form-TOTAL_FORMS"]').val()), 0,
       "initially TOTAL_FORMS is 0")
 
     formset.addForm()
@@ -156,7 +164,8 @@
   )
 
   test("deletes form that was added before", ->
-    formset = @fixtureDivWithForm.djangoFormset(prefix: 'object_set')
+    formset = @fixtureDivWithForm.children('div')
+      .djangoFormset(prefix: 'div-with-form')
 
     formset.addForm()
     equal(getTotalFormsValue(@fixtureDivWithForm, formset), 1,
@@ -172,14 +181,15 @@
   )
 
   test("renumbers when deleting newly added row from the middle", ->
-    formset = @fixtureDivWithForm.djangoFormset(prefix: 'object_set')
+    formset = @fixtureDivWithForm.children('div')
+      .djangoFormset(prefix: 'div-with-form')
 
     formset.addForm()
     formset.addForm()
     formset.deleteForm(0)
 
     equal(@fixtureDivWithForm.find("input[type='text']").last().attr('name'),
-      'object_set-0-text',
+      'div-with-form-0-text',
       "the text input that was at index 1 now has the name objects_set-0-text")
 
     return
@@ -187,12 +197,16 @@
 
   test("deletes initially existing form", ->
     fixture = @fixtureDivWithFormOneInitial
-    formset = fixture.djangoFormset(prefix: 'object_set')
+    formset = fixture.children('div')
+      .djangoFormset(prefix: 'div-with-form-one-initial')
 
     formset.deleteForm(0)
 
-    equal(fixture.find("input[name='object_set-0-DELETE']").val(), "on")
-    equal(formset.forms[0].elem.is(':visible'), false)
+    equal(fixture
+      .find("input[name='div-with-form-one-initial-0-DELETE']").val(), "on",
+      "delete checkbox is now checked")
+    equal(formset.forms[0].elem.is(':visible'), false,
+      "removed form is now hidden")
 
     return
   )
@@ -200,7 +214,8 @@
   test("replaces only first prefix when adding outer forms in nested formset",
   ->
     fixture = @fixtureDivWithNestedFormsets
-    formset = fixture.djangoFormset(prefix: 'object_set')
+    formset = fixture.children('div')
+      .djangoFormset(prefix: 'div-with-nested-formsets')
 
     formset.addForm()
 
@@ -208,13 +223,13 @@
     equal(forms.length, 2, "there's two visible outer forms now")
     form = forms.last()
     equal(form.find('input[type="text"]').first().attr('name'),
-      "object_set-1-text",
+      "div-with-nested-formsets-1-outer",
       "outer form element has prefix correctly replaced in input name")
     nestedEmptyForm = form.find('.empty-form')
     equal(nestedEmptyForm.length, 1, "nested form template was copied as well")
-    nestedInput = nestedEmptyForm.find('input[type="checkbox"]')
+    nestedInput = nestedEmptyForm.find('input[type="text"]')
     equal(nestedInput.attr('name'),
-      "object_set-1-variant_set-__prefix__-checkbox",
+      "div-with-nested-formsets-1-variant_set-__prefix__-inner",
       "nested input in template has only first prefix replaced")
 
     return
@@ -222,21 +237,27 @@
 
   test("addForm on added inner formset works", ->
     fixture = @fixtureDivWithNestedFormsets
-    formset = fixture.djangoFormset(prefix: 'object_set',)
+    formset = fixture.children('div')
+      .djangoFormset(prefix: 'div-with-nested-formsets',)
     nestedFormset = null
 
     $(formset).on('formAdded', (event, form) ->
-      nestedFormset = form.elem.djangoFormset(
+      nestedFormset = form.elem.children('div').djangoFormset(
         prefix: "#{@prefix}-#{form.index}-variant_set"
       )
     )
 
     formset.addForm()
+    form = fixture.children('div:visible').last()
+    equal(form.children('input[type="text"]').attr('name'),
+      'div-with-nested-formsets-1-outer',
+      'one form was added')
+
     nestedFormset.addForm()
-    nestedForm = fixture.children('div:visible').last().children('div:visible')
-      .last()
-    equal(nestedForm.find('input[type="checkbox"]').attr('name'),
-      'object_set-1-variant_set-0-checkbox')
+    nestedForm = form.children('div:visible').last()
+    equal(nestedForm.children('input[type="text"]').attr('name'),
+      'div-with-nested-formsets-1-variant_set-0-inner',
+      'added inner form input has the prefix replaced with the correct id')
 
     return
   )
