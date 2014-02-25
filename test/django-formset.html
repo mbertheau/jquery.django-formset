@@ -84,6 +84,38 @@
         <input id="id_object_set-INITIAL_FORMS" name="object_set-INITIAL_FORMS" type="hidden" value="1"/>
         <input id="id_object_set-MAX_NUM_FORMS" name="object_set-MAX_NUM_FORMS" type="hidden" value="1000"/>
       </div>
+      <div id="div-with-nested-formsets">
+
+        <input id="id_object_set-TOTAL_FORMS" name="object_set-TOTAL_FORMS" type="hidden" value="1"/>
+        <input id="id_object_set-INITIAL_FORMS" name="object_set-INITIAL_FORMS" type="hidden" value="1"/>
+        <input id="id_object_set-MAX_NUM_FORMS" name="object_set-MAX_NUM_FORMS" type="hidden" value="1000"/>
+
+        <div class="empty-form">
+          <input name="object_set-__prefix__-text" type="text"/>
+
+          <input id="id_object_set-__prefix__-variant_set-TOTAL_FORMS" name="object_set-__prefix__-variant_set-TOTAL_FORMS" type="hidden" value="1"/>
+          <input id="id_object_set-__prefix__-variant_set-INITIAL_FORMS" name="object_set-__prefix__-variant_set-INITIAL_FORMS" type="hidden" value="1"/>
+          <input id="id_object_set-__prefix__-variant_set-MAX_NUM_FORMS" name="object_set-__prefix__-variant_set-MAX_NUM_FORMS" type="hidden" value="1000"/>
+
+          <div class="empty-form">
+            <input name="object_set-__prefix__-variant_set-__prefix__-checkbox" type="checkbox"/>
+          </div>
+        </div>
+
+        <div>
+          <input name="object_set-0-text" type="text"/>
+
+          <input id="id_object_set-0-variant_set-TOTAL_FORMS" name="object_set-0-variant_set-TOTAL_FORMS" type="hidden" value="1"/>
+          <input id="id_object_set-0-variant_set-INITIAL_FORMS" name="object_set-0-variant_set-INITIAL_FORMS" type="hidden" value="1"/>
+          <input id="id_object_set-0-variant_set-MAX_NUM_FORMS" name="object_set-0-variant_set-MAX_NUM_FORMS" type="hidden" value="1000"/>
+
+          <div class="empty-form">
+            <input name="object_set-0-variant_set-__prefix__-checkbox" type="checkbox"/>
+          </div>
+          <div>
+            <input name="object_set-0-variant_set-0-checkbox" type="checkbox"/>
+          </div>
+        </div>
   </div>
 </body>
 </html>

@@ -10,7 +10,6 @@ class FormsetError extends Error
 
 (($) ->
 
-  # Collection method.
   $.fn.djangoFormset = (options) ->
     new $.fn.djangoFormset.Formset(this, options)
 
@@ -40,6 +39,12 @@ class FormsetError extends Error
       @forms = base.children(':visible').map((index, element) =>
         new $.fn.djangoFormset.Form($(element), this, index))
 
+      console.log("@forms.length: #{@forms.length}")
+      console.log("@totalForms.val(): #{@totalForms.val()}")
+      if @forms.length != parseInt(@totalForms.val())
+        console.warn("TOTAL_FORMS is #{@totalForms.val()}, but #{@forms.length}
+                      visible children found.")
+
       @insertAnchor = base.children().last()
 
       return
@@ -55,8 +60,9 @@ class FormsetError extends Error
       @insertAnchor = newFormElem
       @forms.push(newForm)
 
-      # form indices start at 0
-      return
+      $(this).trigger("formAdded", [newForm])
+
+      newForm
 
     deleteForm: (index) ->
       form = @forms[index]
@@ -89,6 +95,7 @@ class FormsetError extends Error
       @elem.hide()
 
     _replaceFormIndex: (oldIndexPattern, index) ->
+      @index = index
       prefixRegex = new RegExp("^(id_)?#{@formset.prefix}-#{oldIndexPattern}")
       newPrefix = "#{@formset.prefix}-#{index}"
       @elem.find('input,select,textarea,label').each(->
@@ -107,9 +114,7 @@ class FormsetError extends Error
       @_replaceFormIndex("__prefix__", index)
 
     updateFormIndex: (index) ->
-      @index = index
       @_replaceFormIndex('\\d+', index)
-
 
   $.fn.djangoFormset.default_options =
     prefix: "form"

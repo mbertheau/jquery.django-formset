@@ -11,6 +11,7 @@
       this.fixtureSimpleTable = allFixtures.find('#simple-table');
       this.fixtureDivWithForm = allFixtures.find('#div-with-form');
       this.fixtureDivWithFormOneInitial = allFixtures.find('#div-with-form-one-initial');
+      this.fixtureDivWithNestedFormsets = allFixtures.find('#div-with-nested-formsets');
     }
   });
   test("throws when jQuery selection is empty", function() {
@@ -132,6 +133,39 @@
     formset.deleteForm(0);
     equal(fixture.find("input[name='object_set-0-DELETE']").val(), "on");
     equal(formset.forms[0].elem.is(':visible'), false);
+  });
+  test("replaces only first prefix when adding outer forms in nested formset", function() {
+    var fixture, form, forms, formset, nestedEmptyForm, nestedInput;
+    fixture = this.fixtureDivWithNestedFormsets;
+    formset = fixture.djangoFormset({
+      prefix: 'object_set'
+    });
+    formset.addForm();
+    forms = fixture.children('div:visible');
+    equal(forms.length, 2, "there's two visible outer forms now");
+    form = forms.last();
+    equal(form.find('input[type="text"]').first().attr('name'), "object_set-1-text", "outer form element has prefix correctly replaced in input name");
+    nestedEmptyForm = form.find('.empty-form');
+    equal(nestedEmptyForm.length, 1, "nested form template was copied as well");
+    nestedInput = nestedEmptyForm.find('input[type="checkbox"]');
+    equal(nestedInput.attr('name'), "object_set-1-variant_set-__prefix__-checkbox", "nested input in template has only first prefix replaced");
+  });
+  test("addForm on added inner formset works", function() {
+    var fixture, formset, nestedForm, nestedFormset;
+    fixture = this.fixtureDivWithNestedFormsets;
+    formset = fixture.djangoFormset({
+      prefix: 'object_set'
+    });
+    nestedFormset = null;
+    $(formset).on('formAdded', function(event, form) {
+      return nestedFormset = form.elem.djangoFormset({
+        prefix: "" + this.prefix + "-" + form.index + "-variant_set"
+      });
+    });
+    formset.addForm();
+    nestedFormset.addForm();
+    nestedForm = fixture.children('div:visible').last().children('div:visible').last();
+    equal(nestedForm.find('input[type="checkbox"]').attr('name'), 'object_set-1-variant_set-0-checkbox');
   });
 })(jQuery);
 

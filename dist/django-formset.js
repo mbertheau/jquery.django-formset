@@ -1,4 +1,4 @@
-/*! Django Formset - v0.1.0 - 2014-02-24
+/*! Django Formset - v0.1.0 - 2014-02-25
 * https://github.com/mbertheau/jquery.django-formset
 * Copyright (c) 2014 Markus Bertheau; Licensed MIT */
 var FormsetError,
@@ -58,6 +58,8 @@ FormsetError = (function(_super) {
       newFormElem.insertAfter(this.insertAnchor);
       this.insertAnchor = newFormElem;
       this.forms.push(newForm);
+      $(this).trigger("formAdded", [newForm]);
+      return newForm;
     };
 
     Formset.prototype.deleteForm = function(index) {
@@ -109,6 +111,7 @@ FormsetError = (function(_super) {
 
     Form.prototype._replaceFormIndex = function(oldIndexPattern, index) {
       var newPrefix, prefixRegex;
+      this.index = index;
       prefixRegex = new RegExp("^(id_)?" + this.formset.prefix + "-" + oldIndexPattern);
       newPrefix = "" + this.formset.prefix + "-" + index;
       return this.elem.find('input,select,textarea,label').each(function() {
@@ -132,7 +135,6 @@ FormsetError = (function(_super) {
     };
 
     Form.prototype.updateFormIndex = function(index) {
-      this.index = index;
       return this._replaceFormIndex('\\d+', index);
     };
 

@@ -33,6 +33,8 @@
       @fixtureDivWithForm = allFixtures.find('#div-with-form')
       @fixtureDivWithFormOneInitial = allFixtures.find(
         '#div-with-form-one-initial')
+      @fixtureDivWithNestedFormsets = allFixtures.find(
+        '#div-with-nested-formsets')
       return
   )
 
@@ -191,6 +193,50 @@
 
     equal(fixture.find("input[name='object_set-0-DELETE']").val(), "on")
     equal(formset.forms[0].elem.is(':visible'), false)
+
+    return
+  )
+
+  test("replaces only first prefix when adding outer forms in nested formset",
+  ->
+    fixture = @fixtureDivWithNestedFormsets
+    formset = fixture.djangoFormset(prefix: 'object_set')
+
+    formset.addForm()
+
+    forms = fixture.children('div:visible')
+    equal(forms.length, 2, "there's two visible outer forms now")
+    form = forms.last()
+    equal(form.find('input[type="text"]').first().attr('name'),
+      "object_set-1-text",
+      "outer form element has prefix correctly replaced in input name")
+    nestedEmptyForm = form.find('.empty-form')
+    equal(nestedEmptyForm.length, 1, "nested form template was copied as well")
+    nestedInput = nestedEmptyForm.find('input[type="checkbox"]')
+    equal(nestedInput.attr('name'),
+      "object_set-1-variant_set-__prefix__-checkbox",
+      "nested input in template has only first prefix replaced")
+
+    return
+  )
+
+  test("addForm on added inner formset works", ->
+    fixture = @fixtureDivWithNestedFormsets
+    formset = fixture.djangoFormset(prefix: 'object_set',)
+    nestedFormset = null
+
+    $(formset).on('formAdded', (event, form) ->
+      nestedFormset = form.elem.djangoFormset(
+        prefix: "#{@prefix}-#{form.index}-variant_set"
+      )
+    )
+
+    formset.addForm()
+    nestedFormset.addForm()
+    nestedForm = fixture.children('div:visible').last().children('div:visible')
+      .last()
+    equal(nestedForm.find('input[type="checkbox"]').attr('name'),
+      'object_set-1-variant_set-0-checkbox')
 
     return
   )
