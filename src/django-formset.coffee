@@ -60,7 +60,7 @@ class FormsetError extends Error
       newFormElem = @template.clone().removeClass("empty-form")
 
       newForm = new $.fn.djangoFormset.Form(newFormElem, this)
-      newForm.initFormIndex(@totalForms.val())
+      newForm._initFormIndex(@totalForms.val())
       @totalForms.val(parseInt(@totalForms.val()) + 1)
 
       newFormElem.insertAfter(@insertAnchor)
@@ -80,7 +80,7 @@ class FormsetError extends Error
       @totalForms.val(parseInt(@totalForms.val()) - 1)
       @forms.splice(index, 1)
       for form, i in @forms
-        form.updateFormIndex(i)
+        form._updateFormIndex(i)
 
       if @forms.length == 0
         @insertAnchor = @template
@@ -125,11 +125,11 @@ class FormsetError extends Error
       )
       return
 
-    initFormIndex: (index) ->
+    _initFormIndex: (index) ->
       @_replaceFormIndex("__prefix__", index)
       return
 
-    updateFormIndex: (index) ->
+    _updateFormIndex: (index) ->
       @_replaceFormIndex('\\d+', index)
       return
 
