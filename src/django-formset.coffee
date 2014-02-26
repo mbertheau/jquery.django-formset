@@ -109,12 +109,15 @@ class FormsetError extends Error
                     elem.attr('name').replace(prefixRegex, newPrefix))
         return
       )
+      return
 
     initFormIndex: (index) ->
       @_replaceFormIndex("__prefix__", index)
+      return
 
     updateFormIndex: (index) ->
       @_replaceFormIndex('\\d+', index)
+      return
 
   $.fn.djangoFormset.default_options =
     prefix: "form"

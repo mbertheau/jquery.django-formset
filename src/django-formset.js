@@ -117,7 +117,7 @@ FormsetError = (function(_super) {
       this.index = index;
       prefixRegex = new RegExp("^(id_)?" + this.formset.prefix + "-" + oldIndexPattern);
       newPrefix = "" + this.formset.prefix + "-" + index;
-      return this.elem.find('input,select,textarea,label').each(function() {
+      this.elem.find('input,select,textarea,label').each(function() {
         var attributeName, elem, _i, _len, _ref;
         elem = $(this);
         _ref = ['for', 'id'];
@@ -134,11 +134,11 @@ FormsetError = (function(_super) {
     };
 
     Form.prototype.initFormIndex = function(index) {
-      return this._replaceFormIndex("__prefix__", index);
+      this._replaceFormIndex("__prefix__", index);
     };
 
     Form.prototype.updateFormIndex = function(index) {
-      return this._replaceFormIndex('\\d+', index);
+      this._replaceFormIndex('\\d+', index);
     };
 
     return Form;
