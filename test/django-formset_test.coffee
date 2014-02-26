@@ -48,8 +48,7 @@
 
   test("throws on missing TOTAL_FORMS", ->
     throws((->
-      @fixtureNoTotalForms.children('li')
-        .djangoFormset()),
+      @fixtureNoTotalForms.children('li').djangoFormset()),
       /Management form field 'TOTAL_FORMS' not found for prefix no-total-forms/,
       "throws Error")
     return
@@ -57,16 +56,14 @@
 
   test("throws on missing template", ->
     throws((->
-      @fixtureNoTemplate.children('li')
-        .djangoFormset()),
+      @fixtureNoTemplate.children('li').djangoFormset()),
       /Can\'t find template \(looking for .empty-form\)/
       "throws Error")
     return
   )
 
   test("can add form", ->
-    formset = @fixtureSimpleList.children('li')
-      .djangoFormset()
+    formset = @fixtureSimpleList.children('li').djangoFormset()
 
     equal(@fixtureSimpleList.find(".empty-form").length, 1,
       "there's exactly one template form")
@@ -84,8 +81,7 @@
   )
 
   test("adds form at the end", ->
-    formset = @fixtureSimpleList.children('li')
-      .djangoFormset()
+    formset = @fixtureSimpleList.children('li').djangoFormset()
     equal(@fixtureSimpleList.children(":visible:last-child")
       .contents().first().text(),
       "awesome test markup",
@@ -155,8 +151,7 @@
         "the label's for attribute has the same value as the checkbox' id
          attribute")
 
-    formset = @fixtureDivWithForm.children('div')
-      .djangoFormset()
+    formset = @fixtureDivWithForm.children('div').djangoFormset()
     equal(parseInt(@fixtureDivWithForm
                    .find('input[name="div-with-form-TOTAL_FORMS"]').val()), 0,
       "initially TOTAL_FORMS is 0")
@@ -212,8 +207,7 @@
   )
 
   test("renumbers when deleting newly added row from the middle", ->
-    formset = @fixtureDivWithForm.children('div')
-      .djangoFormset()
+    formset = @fixtureDivWithForm.children('div').djangoFormset()
 
     formset.addForm()
     formset.addForm()
@@ -235,8 +229,7 @@
 
   test("deletes initially existing form", ->
     fixture = @fixtureDivWithFormOneInitial
-    formset = fixture.children('div')
-      .djangoFormset()
+    formset = fixture.children('div').djangoFormset()
 
     formset.deleteForm(0)
 
@@ -251,8 +244,7 @@
 
   test("add - delete - add adds a one new row", ->
     fixture = @fixtureSimpleTable.children('tbody')
-    formset = fixture.children('tr')
-      .djangoFormset()
+    formset = fixture.children('tr').djangoFormset()
 
     equal(fixture.children('tr:visible').length, 0,
       "initially there's 0 forms")
@@ -291,8 +283,7 @@
   test("replaces only first prefix when adding outer forms in nested formset",
   ->
     fixture = @fixtureDivWithNestedFormsets
-    formset = fixture.children('div')
-      .djangoFormset()
+    formset = fixture.children('div').djangoFormset()
 
     formset.addForm()
 
@@ -314,8 +305,7 @@
 
   test("addForm on added inner formset works", ->
     fixture = @fixtureDivWithNestedFormsets
-    formset = fixture.children('div')
-      .djangoFormset()
+    formset = fixture.children('div').djangoFormset()
     nestedFormset = null
 
     $(formset).on('formAdded', (event, form) ->
