@@ -21,13 +21,24 @@ FormsetError = (function(_super) {
     return new $.fn.djangoFormset.Formset(this, options);
   };
   $.fn.djangoFormset.Formset = (function() {
-    function Formset(base, options) {
-      var opts;
-      opts = $.extend({}, $.fn.djangoFormset.default_options, options);
-      this.prefix = opts.prefix;
+    function Formset(base) {
+      var inputName, placeholderPos;
       if (base.length === 0) {
         throw new FormsetError("Empty selector.");
       }
+      this.template = base.filter(".empty-form");
+      if (this.template.length === 0) {
+        throw new FormsetError("Can't find template (looking for .empty-form)");
+      }
+      inputName = this.template.find("input,select,textarea").first().attr('name');
+      if (!inputName) {
+        throw new FormsetError("Can't figure out form prefix because there's no form element in the form template. Please add one.");
+      }
+      placeholderPos = inputName.indexOf('-__prefix__');
+      if (placeholderPos === -1) {
+        throw new FormsetError("Can't figure out form prefix from template because it doesn't contain '-__prefix__'.");
+      }
+      this.prefix = inputName.substring(0, placeholderPos);
       this.totalForms = $("#id_" + this.prefix + "-TOTAL_FORMS");
       if (this.totalForms.length === 0) {
         throw new FormsetError("Management form field 'TOTAL_FORMS' not found for prefix " + this.prefix + ".");
@@ -35,10 +46,6 @@ FormsetError = (function(_super) {
       this.initialForms = $("#id_" + this.prefix + "-INITIAL_FORMS");
       if (this.initialForms.length === 0) {
         throw new FormsetError("Management form field 'INITIAL_FORMS' not found for prefix " + this.prefix + ".");
-      }
-      this.template = base.filter(".empty-form");
-      if (this.template.length === 0) {
-        throw new FormsetError("Can't find template (looking for .empty-form)");
       }
       this.forms = base.filter(':visible').map((function(_this) {
         return function(index, element) {
@@ -150,9 +157,6 @@ FormsetError = (function(_super) {
     return Form;
 
   })();
-  $.fn.djangoFormset.default_options = {
-    prefix: "form"
-  };
 })(jQuery);
 
 //# sourceMappingURL=django-formset.js.map

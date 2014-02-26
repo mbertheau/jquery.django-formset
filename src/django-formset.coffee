@@ -14,12 +14,24 @@ class FormsetError extends Error
     new $.fn.djangoFormset.Formset(this, options)
 
   class $.fn.djangoFormset.Formset
-    constructor: (base, options) ->
-      opts = $.extend({}, $.fn.djangoFormset.default_options, options)
-      @prefix = opts.prefix
-
+    constructor: (base) ->
       if base.length == 0
         throw new FormsetError("Empty selector.")
+
+      @template = base.filter(".empty-form")
+      if @template.length == 0
+        throw new FormsetError("Can't find template (looking for .empty-form)")
+
+      inputName = @template.find("input,select,textarea").first().attr('name')
+      if not inputName
+        throw new FormsetError("Can't figure out form prefix because there's no
+                                form element in the form template. Please add
+                                one.")
+      placeholderPos = inputName.indexOf('-__prefix__')
+      if placeholderPos == -1
+        throw new FormsetError("Can't figure out form prefix from template
+                                because it doesn't contain '-__prefix__'.")
+      @prefix = inputName.substring(0, placeholderPos)
 
       @totalForms = $("#id_#{@prefix}-TOTAL_FORMS")
       if @totalForms.length == 0
@@ -30,11 +42,6 @@ class FormsetError extends Error
       if @initialForms.length == 0
         throw new FormsetError("Management form field 'INITIAL_FORMS' not found
                                 for prefix #{@prefix}.")
-
-      @template = base.filter(".empty-form")
-
-      if @template.length == 0
-        throw new FormsetError("Can't find template (looking for .empty-form)")
 
       @forms = base.filter(':visible').map((index, element) =>
         new $.fn.djangoFormset.Form($(element), this, index))
@@ -125,9 +132,6 @@ class FormsetError extends Error
     updateFormIndex: (index) ->
       @_replaceFormIndex('\\d+', index)
       return
-
-  $.fn.djangoFormset.default_options =
-    prefix: "form"
 
   return
 
