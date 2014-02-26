@@ -75,16 +75,19 @@ FormsetError = (function(_super) {
     };
 
     Formset.prototype.handleFormRemoved = function(index) {
-      var form, i, _i, _len, _ref, _results;
+      var form, i, _i, _len, _ref;
       this.totalForms.val(parseInt(this.totalForms.val()) - 1);
       this.forms.splice(index, 1);
       _ref = this.forms;
-      _results = [];
       for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
         form = _ref[i];
-        _results.push(form.updateFormIndex(i));
+        form.updateFormIndex(i);
       }
-      return _results;
+      if (this.forms.length === 0) {
+        this.insertAnchor = this.template;
+      } else {
+        this.insertAnchor = this.forms[this.forms.length - 1].elem;
+      }
     };
 
     return Formset;
@@ -120,7 +123,7 @@ FormsetError = (function(_super) {
       this.index = index;
       prefixRegex = new RegExp("^(id_)?" + this.formset.prefix + "-" + oldIndexPattern);
       newPrefix = "" + this.formset.prefix + "-" + index;
-      return this.elem.find('input,select,textarea,label').each(function() {
+      this.elem.find('input,select,textarea,label').each(function() {
         var attributeName, elem, _i, _len, _ref;
         elem = $(this);
         _ref = ['for', 'id'];
@@ -137,11 +140,11 @@ FormsetError = (function(_super) {
     };
 
     Form.prototype.initFormIndex = function(index) {
-      return this._replaceFormIndex("__prefix__", index);
+      this._replaceFormIndex("__prefix__", index);
     };
 
     Form.prototype.updateFormIndex = function(index) {
-      return this._replaceFormIndex('\\d+', index);
+      this._replaceFormIndex('\\d+', index);
     };
 
     return Form;

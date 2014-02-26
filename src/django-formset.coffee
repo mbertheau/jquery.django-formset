@@ -75,6 +75,13 @@ class FormsetError extends Error
       for form, i in @forms
         form.updateFormIndex(i)
 
+      if @forms.length == 0
+        @insertAnchor = @template
+      else
+        @insertAnchor = @forms[@forms.length - 1].elem
+
+      return
+
   class $.fn.djangoFormset.Form
     constructor: (@elem, @formset, @index) ->
 

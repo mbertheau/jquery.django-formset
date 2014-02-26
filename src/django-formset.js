@@ -72,16 +72,19 @@ FormsetError = (function(_super) {
     };
 
     Formset.prototype.handleFormRemoved = function(index) {
-      var form, i, _i, _len, _ref, _results;
+      var form, i, _i, _len, _ref;
       this.totalForms.val(parseInt(this.totalForms.val()) - 1);
       this.forms.splice(index, 1);
       _ref = this.forms;
-      _results = [];
       for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
         form = _ref[i];
-        _results.push(form.updateFormIndex(i));
+        form.updateFormIndex(i);
       }
-      return _results;
+      if (this.forms.length === 0) {
+        this.insertAnchor = this.template;
+      } else {
+        this.insertAnchor = this.forms[this.forms.length - 1].elem;
+      }
     };
 
     return Formset;

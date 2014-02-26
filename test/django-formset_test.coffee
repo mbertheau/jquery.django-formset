@@ -216,6 +216,45 @@
     return
   )
 
+  test("add - delete - add adds a one new row", ->
+    fixture = @fixtureSimpleTable.children('tbody')
+    formset = fixture.children('tr')
+      .djangoFormset(prefix: 'simple-table')
+
+    equal(fixture.children('tr:visible').length, 0,
+      "initially there's 0 forms")
+
+    formset.addForm()
+    equal(fixture.children('tr:visible').length, 1,
+      "after adding one there's 1")
+
+    formset.addForm()
+    equal(fixture.children('tr:visible').length, 2,
+      "after adding another one there's 2")
+
+    formset.deleteForm(1)
+    equal(fixture.children('tr:visible').length, 1,
+      "after deleting one it's 1 again")
+
+    formset.addForm()
+    equal(fixture.children('tr:visible').length, 2,
+      "and after adding one again it's 2 again")
+
+    formset.deleteForm(1)
+    equal(fixture.children('tr:visible').length, 1,
+      "after deleting one it's 1 again")
+
+    formset.deleteForm(0)
+    equal(fixture.children('tr:visible').length, 0,
+      "after deleting the last one it's 0")
+
+    formset.addForm()
+    equal(fixture.children('tr:visible').length, 1,
+      "and after adding one again it's 1 again")
+
+    return
+  )
+
   test("replaces only first prefix when adding outer forms in nested formset",
   ->
     fixture = @fixtureDivWithNestedFormsets
