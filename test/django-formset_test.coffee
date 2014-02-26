@@ -20,23 +20,24 @@
   #      notStrictEqual(actual, expected, [message])
   #      throws(block, [expected], [message])
   #
-  module("jQuery#djangoFormset",
 
-    # This will run before each test in this module.
-    setup: ->
-      allFixtures = $("#qunit-fixture")
-      @fixtureIDontExist = allFixtures.find('#i-dont-exist')
-      @fixtureNoTemplate = allFixtures.find('#no-template')
-      @fixtureNoTotalForms = allFixtures.find('#no-total-forms')
-      @fixtureSimpleList = allFixtures.find('#simple-list')
-      @fixtureSimpleTable = allFixtures.find('#simple-table')
-      @fixtureDivWithForm = allFixtures.find('#div-with-form')
-      @fixtureDivWithFormOneInitial = allFixtures.find(
-        '#div-with-form-one-initial')
-      @fixtureDivWithNestedFormsets = allFixtures.find(
-        '#div-with-nested-formsets')
-      return
-  )
+  # This will run before each test in each module.
+  moduleSetup = ->
+    allFixtures = $("#qunit-fixture")
+    @fixtureIDontExist = allFixtures.find('#i-dont-exist')
+    @fixtureNoTemplate = allFixtures.find('#no-template')
+    @fixtureNoTotalForms = allFixtures.find('#no-total-forms')
+    @fixtureSimpleList = allFixtures.find('#simple-list')
+    @fixtureSimpleFormAsList = allFixtures.find('#simple-form-as-list')
+    @fixtureSimpleTable = allFixtures.find('#simple-table')
+    @fixtureDivWithForm = allFixtures.find('#div-with-form')
+    @fixtureDivWithFormOneInitial = allFixtures.find(
+      '#div-with-form-one-initial')
+    @fixtureDivWithNestedFormsets = allFixtures.find(
+      '#div-with-nested-formsets')
+    return
+
+  module("jQuery#djangoFormset - functional tests", setup: moduleSetup)
 
   test("throws when jQuery selection is empty", ->
     throws((-> @fixtureIDontExist.children('li').djangoFormset()),
@@ -85,21 +86,24 @@
   test("adds form at the end", ->
     formset = @fixtureSimpleList.children('li')
       .djangoFormset()
-    equal(@fixtureSimpleList.children(":visible:last-child").text(),
+    equal(@fixtureSimpleList.children(":visible:last-child")
+      .contents().first().text(),
       "awesome test markup",
       "just checking current last form")
 
     formset.addForm()
     lastChild = @fixtureSimpleList.children(":visible:last-child")
+      .contents().first()
     equal(lastChild.text(), "template",
       "first new form was added at the end")
 
-    lastChild.text("this is the form that was added first")
+    lastChild[0].data = "this is the form that was added first"
     equal(lastChild.text(), "this is the form that was added first",
       "the text of the newly added form was changed")
 
     formset.addForm()
     lastChild = @fixtureSimpleList.children(":visible:last-child")
+      .contents().first()
     equal(lastChild.text(), "template",
       "second new form was added at the end")
 
@@ -161,6 +165,31 @@
     checkFormIndex(@fixtureDivWithForm, formset, 0)
     formset.addForm()
     checkFormIndex(@fixtureDivWithForm, formset, 1)
+    return
+  )
+
+  test("adds delete button to existing and new forms", ->
+    fixture = @fixtureDivWithFormOneInitial
+    formset = fixture.children('div').djangoFormset()
+
+    checkDeleteButton = (form) ->
+      deleteButton = form.elem.children().last()
+      equal(deleteButton[0].outerHTML
+        '<button type="button" class="btn btn-danger"> Delete </button>',
+        "Last element in form is the delete button")
+
+      deleteName = "#{formset.prefix}-#{form.index}-DELETE"
+      equal(form.elem.find("input[name='#{deleteName}']").is(':hidden'), true,
+        "the DELETE input is hidden")
+
+      equal(form.elem.find("label[for='id_#{deleteName}']").length, 0,
+        "there's no label for the DELETE input")
+
+    checkDeleteButton(formset.forms[0])
+
+    formset.addForm()
+    checkDeleteButton(formset.forms[1])
+
     return
   )
 
@@ -304,6 +333,25 @@
     equal(nestedForm.children('input[type="text"]').attr('name'),
       'div-with-nested-formsets-1-variant_set-0-inner',
       'added inner form input has the prefix replaced with the correct id')
+
+    return
+  )
+
+  module("jQuery#djangoFormset - unit tests", setup: moduleSetup)
+
+  test("Form.getDeleteButtonContainer", ->
+    f = $.fn.djangoFormset.Form::getDeleteButtonContainer
+    equal(f.call(elem: @fixtureSimpleTable.find('tr'))[0],
+      @fixtureSimpleTable.find('td')[0],
+      "returns the last td as the container for table rows")
+
+    equal(f.call(elem: @fixtureSimpleFormAsList.children().last())[0],
+      @fixtureSimpleFormAsList.children('ul').children('li')[1],
+      "returns a new empty li at the end for lists")
+
+    equal(f.call(elem: @fixtureSimpleList.children().last())[0],
+      @fixtureSimpleList.children().last()[0],
+      "returns the last child for all other elements")
 
     return
   )

@@ -1,18 +1,20 @@
 (function($) {
-  var getTotalFormsValue;
-  module("jQuery#djangoFormset", {
-    setup: function() {
-      var allFixtures;
-      allFixtures = $("#qunit-fixture");
-      this.fixtureIDontExist = allFixtures.find('#i-dont-exist');
-      this.fixtureNoTemplate = allFixtures.find('#no-template');
-      this.fixtureNoTotalForms = allFixtures.find('#no-total-forms');
-      this.fixtureSimpleList = allFixtures.find('#simple-list');
-      this.fixtureSimpleTable = allFixtures.find('#simple-table');
-      this.fixtureDivWithForm = allFixtures.find('#div-with-form');
-      this.fixtureDivWithFormOneInitial = allFixtures.find('#div-with-form-one-initial');
-      this.fixtureDivWithNestedFormsets = allFixtures.find('#div-with-nested-formsets');
-    }
+  var getTotalFormsValue, moduleSetup;
+  moduleSetup = function() {
+    var allFixtures;
+    allFixtures = $("#qunit-fixture");
+    this.fixtureIDontExist = allFixtures.find('#i-dont-exist');
+    this.fixtureNoTemplate = allFixtures.find('#no-template');
+    this.fixtureNoTotalForms = allFixtures.find('#no-total-forms');
+    this.fixtureSimpleList = allFixtures.find('#simple-list');
+    this.fixtureSimpleFormAsList = allFixtures.find('#simple-form-as-list');
+    this.fixtureSimpleTable = allFixtures.find('#simple-table');
+    this.fixtureDivWithForm = allFixtures.find('#div-with-form');
+    this.fixtureDivWithFormOneInitial = allFixtures.find('#div-with-form-one-initial');
+    this.fixtureDivWithNestedFormsets = allFixtures.find('#div-with-nested-formsets');
+  };
+  module("jQuery#djangoFormset - functional tests", {
+    setup: moduleSetup
   });
   test("throws when jQuery selection is empty", function() {
     throws((function() {
@@ -41,14 +43,14 @@
   test("adds form at the end", function() {
     var formset, lastChild;
     formset = this.fixtureSimpleList.children('li').djangoFormset();
-    equal(this.fixtureSimpleList.children(":visible:last-child").text(), "awesome test markup", "just checking current last form");
+    equal(this.fixtureSimpleList.children(":visible:last-child").contents().first().text(), "awesome test markup", "just checking current last form");
     formset.addForm();
-    lastChild = this.fixtureSimpleList.children(":visible:last-child");
+    lastChild = this.fixtureSimpleList.children(":visible:last-child").contents().first();
     equal(lastChild.text(), "template", "first new form was added at the end");
-    lastChild.text("this is the form that was added first");
+    lastChild[0].data = "this is the form that was added first";
     equal(lastChild.text(), "this is the form that was added first", "the text of the newly added form was changed");
     formset.addForm();
-    lastChild = this.fixtureSimpleList.children(":visible:last-child");
+    lastChild = this.fixtureSimpleList.children(":visible:last-child").contents().first();
     equal(lastChild.text(), "template", "second new form was added at the end");
   });
   test("adds forms to tables as new rows", function() {
@@ -90,6 +92,22 @@
     checkFormIndex(this.fixtureDivWithForm, formset, 0);
     formset.addForm();
     checkFormIndex(this.fixtureDivWithForm, formset, 1);
+  });
+  test("adds delete button to existing and new forms", function() {
+    var checkDeleteButton, fixture, formset;
+    fixture = this.fixtureDivWithFormOneInitial;
+    formset = fixture.children('div').djangoFormset();
+    checkDeleteButton = function(form) {
+      var deleteButton, deleteName;
+      deleteButton = form.elem.children().last();
+      equal(deleteButton[0].outerHTML, '<button type="button" class="btn btn-danger"> Delete </button>', "Last element in form is the delete button");
+      deleteName = "" + formset.prefix + "-" + form.index + "-DELETE";
+      equal(form.elem.find("input[name='" + deleteName + "']").is(':hidden'), true, "the DELETE input is hidden");
+      return equal(form.elem.find("label[for='id_" + deleteName + "']").length, 0, "there's no label for the DELETE input");
+    };
+    checkDeleteButton(formset.forms[0]);
+    formset.addForm();
+    checkDeleteButton(formset.forms[1]);
   });
   test("deletes form that was added before", function() {
     var fixture, formset, _i, _len, _ref;
@@ -173,6 +191,22 @@
     nestedFormset.addForm();
     nestedForm = form.children('div:visible').last();
     equal(nestedForm.children('input[type="text"]').attr('name'), 'div-with-nested-formsets-1-variant_set-0-inner', 'added inner form input has the prefix replaced with the correct id');
+  });
+  module("jQuery#djangoFormset - unit tests", {
+    setup: moduleSetup
+  });
+  test("Form.getDeleteButtonContainer", function() {
+    var f;
+    f = $.fn.djangoFormset.Form.prototype.getDeleteButtonContainer;
+    equal(f.call({
+      elem: this.fixtureSimpleTable.find('tr')
+    })[0], this.fixtureSimpleTable.find('td')[0], "returns the last td as the container for table rows");
+    equal(f.call({
+      elem: this.fixtureSimpleFormAsList.children().last()
+    })[0], this.fixtureSimpleFormAsList.children('ul').children('li')[1], "returns a new empty li at the end for lists");
+    equal(f.call({
+      elem: this.fixtureSimpleList.children().last()
+    })[0], this.fixtureSimpleList.children().last()[0], "returns the last child for all other elements");
   });
 })(jQuery);
 

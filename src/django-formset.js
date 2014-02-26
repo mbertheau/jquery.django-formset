@@ -62,8 +62,7 @@ FormsetError = (function(_super) {
     Formset.prototype.addForm = function() {
       var newForm, newFormElem;
       newFormElem = this.template.clone().removeClass("empty-form");
-      newForm = new $.fn.djangoFormset.Form(newFormElem, this);
-      newForm.initFormIndex(this.totalForms.val());
+      newForm = new $.fn.djangoFormset.Form(newFormElem, this, this.totalForms.val());
       this.totalForms.val(parseInt(this.totalForms.val()) + 1);
       newFormElem.insertAfter(this.insertAnchor);
       this.insertAnchor = newFormElem;
@@ -85,7 +84,7 @@ FormsetError = (function(_super) {
       _ref = this.forms;
       for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
         form = _ref[i];
-        form.updateFormIndex(i);
+        form._updateFormIndex(i);
       }
       if (this.forms.length === 0) {
         this.insertAnchor = this.template;
@@ -99,18 +98,38 @@ FormsetError = (function(_super) {
   })();
   $.fn.djangoFormset.Form = (function() {
     function Form(elem, formset, index) {
+      var deleteName;
       this.elem = elem;
       this.formset = formset;
       this.index = index;
+      if (this.index !== void 0) {
+        this._initFormIndex(this.index);
+      }
+      deleteName = "" + this.formset.prefix + "-" + this.index + "-DELETE";
+      this.deleteInput = this.elem.find("input[name='" + deleteName + "']");
+      this._hideDeleteCheckbox();
+      this._addDeleteButton();
     }
 
+    Form.prototype.getDeleteButton = function() {
+      return $('<button type="button" class="btn btn-danger"> Delete </button>');
+    };
+
+    Form.prototype.getDeleteButtonContainer = function() {
+      if (this.elem.is('TR')) {
+        return this.elem.children().last();
+      } else if (this.elem.is('UL') || this.elem.is('OL')) {
+        return this.elem.append('li').children().last();
+      } else {
+        return this.elem;
+      }
+    };
+
     Form.prototype["delete"] = function() {
-      var deleteInput, deleteName, isInitial;
-      deleteName = "" + this.formset.prefix + "-" + this.index + "-DELETE";
-      deleteInput = this.elem.find("input[name='" + deleteName + "']");
+      var isInitial;
       isInitial = this.index < parseInt(this.formset.initialForms.val());
       if (isInitial) {
-        deleteInput.val('on');
+        this.deleteInput.val('on');
         this.hide();
       } else {
         this.elem.remove();
@@ -120,6 +139,25 @@ FormsetError = (function(_super) {
 
     Form.prototype.hide = function() {
       return this.elem.hide();
+    };
+
+    Form.prototype._hideDeleteCheckbox = function() {
+      var newDeleteInput;
+      this.deleteInput.before("<input type='hidden' name='" + (this.deleteInput.attr('name')) + "' id='" + (this.deleteInput.attr('id')) + "' value='" + (this.deleteInput.val()) + "'/>");
+      newDeleteInput = this.deleteInput.prev();
+      this.elem.find("label[for='" + (this.deleteInput.attr('id')) + "']").remove();
+      this.deleteInput.remove();
+      return this.deleteInput = newDeleteInput;
+    };
+
+    Form.prototype._addDeleteButton = function() {
+      this.deleteButton = this.getDeleteButton();
+      this.getDeleteButtonContainer().append(this.deleteButton);
+      return this.deleteButton.on('click', (function(_this) {
+        return function(event) {
+          return _this["delete"]();
+        };
+      })(this));
     };
 
     Form.prototype._replaceFormIndex = function(oldIndexPattern, index) {
@@ -143,11 +181,11 @@ FormsetError = (function(_super) {
       });
     };
 
-    Form.prototype.initFormIndex = function(index) {
+    Form.prototype._initFormIndex = function(index) {
       this._replaceFormIndex("__prefix__", index);
     };
 
-    Form.prototype.updateFormIndex = function(index) {
+    Form.prototype._updateFormIndex = function(index) {
       this._replaceFormIndex('\\d+', index);
     };
 

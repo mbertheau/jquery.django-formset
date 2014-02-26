@@ -59,8 +59,8 @@ class FormsetError extends Error
     addForm: ->
       newFormElem = @template.clone().removeClass("empty-form")
 
-      newForm = new $.fn.djangoFormset.Form(newFormElem, this)
-      newForm._initFormIndex(@totalForms.val())
+      newForm = new $.fn.djangoFormset.Form(newFormElem, this,
+        @totalForms.val())
       @totalForms.val(parseInt(@totalForms.val()) + 1)
 
       newFormElem.insertAfter(@insertAnchor)
@@ -91,14 +91,31 @@ class FormsetError extends Error
 
   class $.fn.djangoFormset.Form
     constructor: (@elem, @formset, @index) ->
+      if @index isnt undefined
+        @_initFormIndex(@index)
+      deleteName = "#{@formset.prefix}-#{@index}-DELETE"
+      @deleteInput = @elem.find("input[name='#{deleteName}']")
+      @_hideDeleteCheckbox()
+      @_addDeleteButton()
+
+    getDeleteButton: ->
+      $('<button type="button" class="btn btn-danger">
+           Delete
+         </button>')
+
+    getDeleteButtonContainer: ->
+      if @elem.is('TR')
+        @elem.children().last()
+      else if @elem.is('UL') or @elem.is('OL')
+        @elem.append('li').children().last()
+      else
+        @elem
 
     delete: ->
-      deleteName = "#{@formset.prefix}-#{@index}-DELETE"
-      deleteInput = @elem.find("input[name='#{deleteName}']")
       isInitial = @index < parseInt(@formset.initialForms.val())
 
       if isInitial
-        deleteInput.val('on')
+        @deleteInput.val('on')
         @hide()
       else
         @elem.remove()
@@ -107,6 +124,22 @@ class FormsetError extends Error
 
     hide: ->
       @elem.hide()
+
+    _hideDeleteCheckbox: ->
+      @deleteInput.before("<input type='hidden'
+                                  name='#{@deleteInput.attr('name')}'
+                                  id='#{@deleteInput.attr('id')}'
+                                  value='#{@deleteInput.val()}'/>")
+      newDeleteInput = @deleteInput.prev()
+      # Remove any label for the delete checkbox
+      @elem.find("label[for='#{@deleteInput.attr('id')}']").remove()
+      @deleteInput.remove()
+      @deleteInput = newDeleteInput
+
+    _addDeleteButton: ->
+      @deleteButton = @getDeleteButton()
+      @getDeleteButtonContainer().append(@deleteButton)
+      @deleteButton.on('click', (event) => @delete())
 
     _replaceFormIndex: (oldIndexPattern, index) ->
       @index = index
