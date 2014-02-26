@@ -30,12 +30,14 @@
       </ul>
 
       <ul id="no-template">
-          <input id="id_no-template-TOTAL_FORMS" name="no-template-TOTAL_FORMS" type="hidden" value="3"/>
+          <input id="id_no-template-TOTAL_FORMS" name="no-template-TOTAL_FORMS" type="hidden" value="1"/>
+          <input id="id_no-template-INITIAL_FORMS" name="no-template-INITIAL_FORMS" type="hidden" value="1"/>
           <li>lame test markup</li>
       </ul>
 
       <ul id="simple-list">
           <input id="id_simple-list-TOTAL_FORMS" name="simple-list-TOTAL_FORMS" type="hidden" value="3"/>
+          <input id="id_simple-list-INITIAL_FORMS" name="simple-list-INITIAL_FORMS" type="hidden" value="3"/>
           <li class="empty-form">template</li>
           <li>lame test markup</li>
           <li>normal test markup</li>
@@ -45,6 +47,7 @@
       <table id="simple-table">
         <caption>Table caption</caption>
         <input id="id_simple-table-TOTAL_FORMS" name="simple-table-TOTAL_FORMS" type="hidden" value="0"/>
+        <input id="id_simple-table-INITIAL_FORMS" name="simple-table-INITIAL_FORMS" type="hidden" value="0"/>
         <tr class="empty-form">
           <td>
             template
@@ -62,6 +65,8 @@
           <textarea name="div-with-form-__prefix__-textarea"></textarea>
           <label for="id_div-with-form-__prefix__-checkbox">Check: </label>
           <input id="id_div-with-form-__prefix__-checkbox" name="div-with-form-__prefix__-checkbox" type="checkbox"/>
+          <label for="id_div-with-form-0-DELETE">Delete:</label>
+          <input id="id_div-with-form-0-DELETE" name="div-with-form-0-DELETE" type="checkbox">
         </div>
         <input id="id_div-with-form-INITIAL_FORMS" name="div-with-form-INITIAL_FORMS" type="hidden" value="0"/>
         <input id="id_div-with-form-MAX_NUM_FORMS" name="div-with-form-MAX_NUM_FORMS" type="hidden" value="1000"/>
@@ -77,6 +82,8 @@
           <textarea name="div-with-form-one-initial-__prefix__-textarea"></textarea>
           <label for="id_div-with-form-one-initial-__prefix__-checkbox">Check: </label>
           <input id="id_div-with-form-one-initial-__prefix__-checkbox" name="div-with-form-one-initial-__prefix__-checkbox" type="checkbox"/>
+          <label for="id_div-with-form-one-initial-__prefix__-DELETE">Delete:</label>
+          <input id="id_div-with-form-one-initial-__prefix__-DELETE" name="div-with-form-one-initial-__prefix__-DELETE" type="checkbox">
         </div>
         <div>
           <input name="div-with-form-one-initial-0-text" type="text"/>
@@ -108,11 +115,15 @@
 
           <div class="empty-form">
             <input name="div-with-nested-formsets-__prefix__-variant_set-__prefix__-inner" type="text"/>
+            <label for="id_div-with-nested-formsets-__prefix__-variant-set-__prefix__-DELETE">Delete:</label>
+            <input id="id_div-with-nested-formsets-__prefix__-variant-set-__prefix__-DELETE" name="div-with-nested-formsets-__prefix__-variant-set-__prefix__-DELETE" type="checkbox">
           </div>
         </div>
 
         <div>
           <input name="div-with-nested-formsets-0-outer" type="text"/>
+          <label for="id_div-with-nested-formsets-0-DELETE">Delete:</label>
+          <input id="id_div-with-nested-formsets-0-DELETE" name="div-with-nested-formsets-0-DELETE" type="checkbox">
 
           <input id="id_div-with-nested-formsets-0-variant_set-TOTAL_FORMS" name="div-with-nested-formsets-0-variant_set-TOTAL_FORMS" type="hidden" value="1"/>
           <input id="id_div-with-nested-formsets-0-variant_set-INITIAL_FORMS" name="div-with-nested-formsets-0-variant_set-INITIAL_FORMS" type="hidden" value="1"/>
@@ -120,9 +131,13 @@
 
           <div class="empty-form">
             <input name="div-with-nested-formsets-0-variant_set-__prefix__-inner" type="text"/>
+            <label for="id_div-with-nested-formsets-0-variant-set-__prefix__-DELETE">Delete:</label>
+            <input id="id_div-with-nested-formsets-0-variant-set-__prefix__-DELETE" name="div-with-nested-formsets-0-variant-set-__prefix__-DELETE" type="checkbox">
           </div>
           <div>
             <input name="div-with-nested-formsets-0-variant_set-0-inner" type="text"/>
+            <label for="id_div-with-nested-formsets-0-variant-set-0-DELETE">Delete:</label>
+            <input id="id_div-with-nested-formsets-0-variant-set-0-DELETE" name="div-with-nested-formsets-0-variant-set-0-DELETE" type="checkbox">
           </div>
         </div>
 

@@ -26,12 +26,15 @@ class FormsetError extends Error
         throw new FormsetError("Management form field 'TOTAL_FORMS' not found
                                 for prefix #{@prefix}.")
 
+      @initialForms = $("#id_#{@prefix}-INITIAL_FORMS")
+      if @initialForms.length == 0
+        throw new FormsetError("Management form field 'INITIAL_FORMS' not found
+                                for prefix #{@prefix}.")
+
       @template = base.filter(".empty-form")
 
       if @template.length == 0
         throw new FormsetError("Can't find template (looking for .empty-form)")
-
-      initialForms = base.not('.empty-form')
 
       @forms = base.filter(':visible').map((index, element) =>
         new $.fn.djangoFormset.Form($(element), this, index))
@@ -78,7 +81,7 @@ class FormsetError extends Error
     delete: ->
       deleteName = "#{@formset.prefix}-#{@index}-DELETE"
       deleteInput = @elem.find("input[name='#{deleteName}']")
-      isInitial = deleteInput.get(0)?
+      isInitial = @index < parseInt(@formset.initialForms.val())
 
       if isInitial
         deleteInput.val('on')

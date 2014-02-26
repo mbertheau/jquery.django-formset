@@ -1,4 +1,4 @@
-/*! Django Formset - v0.1.0 - 2014-02-25
+/*! Django Formset - v0.1.0 - 2014-02-26
 * https://github.com/mbertheau/jquery.django-formset
 * Copyright (c) 2014 Markus Bertheau; Licensed MIT */
 var FormsetError,
@@ -22,7 +22,7 @@ FormsetError = (function(_super) {
   };
   $.fn.djangoFormset.Formset = (function() {
     function Formset(base, options) {
-      var initialForms, opts;
+      var opts;
       opts = $.extend({}, $.fn.djangoFormset.default_options, options);
       this.prefix = opts.prefix;
       if (base.length === 0) {
@@ -32,11 +32,14 @@ FormsetError = (function(_super) {
       if (this.totalForms.length === 0) {
         throw new FormsetError("Management form field 'TOTAL_FORMS' not found for prefix " + this.prefix + ".");
       }
+      this.initialForms = $("#id_" + this.prefix + "-INITIAL_FORMS");
+      if (this.initialForms.length === 0) {
+        throw new FormsetError("Management form field 'INITIAL_FORMS' not found for prefix " + this.prefix + ".");
+      }
       this.template = base.filter(".empty-form");
       if (this.template.length === 0) {
         throw new FormsetError("Can't find template (looking for .empty-form)");
       }
-      initialForms = base.not('.empty-form');
       this.forms = base.filter(':visible').map((function(_this) {
         return function(index, element) {
           return new $.fn.djangoFormset.Form($(element), _this, index);
@@ -98,7 +101,7 @@ FormsetError = (function(_super) {
       var deleteInput, deleteName, isInitial;
       deleteName = "" + this.formset.prefix + "-" + this.index + "-DELETE";
       deleteInput = this.elem.find("input[name='" + deleteName + "']");
-      isInitial = deleteInput.get(0) != null;
+      isInitial = this.index < parseInt(this.formset.initialForms.val());
       if (isInitial) {
         deleteInput.val('on');
         this.hide();

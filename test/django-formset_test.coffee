@@ -134,7 +134,8 @@
         checkbox: 'input[type="checkbox"]'
       }
       for type, selector of types_and_selectors
-        element = fixture.find("div:visible #{selector}").last()
+        element = fixture.find("div:visible #{selector}[name$='#{type}']")
+          .last()
         nameValue = element.attr('name')
         idValue = element.attr('id')
 
@@ -164,19 +165,23 @@
   )
 
   test("deletes form that was added before", ->
-    formset = @fixtureDivWithForm.children('div')
-      .djangoFormset(prefix: 'div-with-form')
+    for prefix, fixture of {
+      'div-with-form-one-initial': @fixtureDivWithFormOneInitial
+      'div-with-nested-formsets': @fixtureDivWithNestedFormsets
+    }
+      formset = fixture.children('div')
+        .djangoFormset(prefix: prefix)
 
-    formset.addForm()
-    equal(getTotalFormsValue(@fixtureDivWithForm, formset), 1,
-      "TOTAL_FORMS is 1 now")
+      formset.addForm()
+      equal(getTotalFormsValue(fixture, formset), 2,
+        "for #{prefix}: TOTAL_FORMS is 2 now")
 
-    formset.deleteForm(0)
+      formset.deleteForm(1)
 
-    equal(@fixtureDivWithForm.children('div:visible').length, 0,
-      "the added form was deleted again")
-    equal(getTotalFormsValue(@fixtureDivWithForm, formset), 0,
-      "TOTAL_FORMS is back to 0 again")
+      equal(fixture.children('div').length, 2,
+        "for #{prefix}: the added form was deleted again")
+      equal(getTotalFormsValue(fixture, formset), 1,
+        "for #{prefix}: TOTAL_FORMS is back to 1 again")
     return
   )
 

@@ -84,7 +84,7 @@
       };
       for (type in types_and_selectors) {
         selector = types_and_selectors[type];
-        element = fixture.find("div:visible " + selector).last();
+        element = fixture.find("div:visible " + selector + "[name$='" + type + "']").last();
         nameValue = element.attr('name');
         idValue = element.attr('id');
         equal(nameValue, "" + formset.prefix + "-" + index + "-" + type, "the " + type + "'s name has the id " + index + " in it");
@@ -104,15 +104,22 @@
     checkFormIndex(this.fixtureDivWithForm, formset, 1);
   });
   test("deletes form that was added before", function() {
-    var formset;
-    formset = this.fixtureDivWithForm.children('div').djangoFormset({
-      prefix: 'div-with-form'
-    });
-    formset.addForm();
-    equal(getTotalFormsValue(this.fixtureDivWithForm, formset), 1, "TOTAL_FORMS is 1 now");
-    formset.deleteForm(0);
-    equal(this.fixtureDivWithForm.children('div:visible').length, 0, "the added form was deleted again");
-    equal(getTotalFormsValue(this.fixtureDivWithForm, formset), 0, "TOTAL_FORMS is back to 0 again");
+    var fixture, formset, prefix, _ref;
+    _ref = {
+      'div-with-form-one-initial': this.fixtureDivWithFormOneInitial,
+      'div-with-nested-formsets': this.fixtureDivWithNestedFormsets
+    };
+    for (prefix in _ref) {
+      fixture = _ref[prefix];
+      formset = fixture.children('div').djangoFormset({
+        prefix: prefix
+      });
+      formset.addForm();
+      equal(getTotalFormsValue(fixture, formset), 2, "for " + prefix + ": TOTAL_FORMS is 2 now");
+      formset.deleteForm(1);
+      equal(fixture.children('div').length, 2, "for " + prefix + ": the added form was deleted again");
+      equal(getTotalFormsValue(fixture, formset), 1, "for " + prefix + ": TOTAL_FORMS is back to 1 again");
+    }
   });
   test("renumbers when deleting newly added row from the middle", function() {
     var formset;
