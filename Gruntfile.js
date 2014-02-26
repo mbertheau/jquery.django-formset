@@ -56,7 +56,7 @@ module.exports = function(grunt) {
         'arrow_spacing': {'level': 'error'},
         'colon_assignment_spacing': {'level': 'error',
                                      'spacing': {'left': 0, 'right': 1}},
-        'cyclomatic_complexity': {'level': 'error'},
+        'cyclomatic_complexity': {'level': 'warn'},
         'line_endings': {'level': 'error'},
         'newlines_after_classes': {'level': 'error'},
         'no_empty_param_list': {'level': 'error'},
