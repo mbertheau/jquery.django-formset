@@ -33,6 +33,8 @@
     @fixtureDivWithForm = allFixtures.find('#div-with-form')
     @fixtureDivWithFormOneInitial = allFixtures.find(
       '#div-with-form-one-initial')
+    @fixtureTabsWithFormThreeInitial = allFixtures.find(
+      '#tabs-with-form-three-initial')
     @fixtureDivWithNestedFormsets = allFixtures.find(
       '#div-with-nested-formsets')
     return
@@ -327,6 +329,93 @@
     return
   )
 
+  test("Adds new tab pane and new tab nav after the last form", ->
+    fixture = @fixtureTabsWithFormThreeInitial
+    formset = fixture.find('.tab-content').children().djangoFormset()
+
+    lastTabPane = fixture.find('.tab-pane').last()
+    lastTabNav = fixture.find("[href='##{lastTabPane.attr('id')}']")
+      .closest('.nav > *')
+
+    formset.addForm()
+
+    equal(lastTabPane.next().attr('id'), 'id_tabs-with-form-three-initial-3',
+      "tab pane with id 3 was added")
+
+    equal(lastTabNav.next().find('a').attr('href'),
+      '#id_tabs-with-form-three-initial-3',
+      "the last tab activates the newly added tab pane")
+
+    equal(fixture.find('.nav').children('.active').find("[data-toggle='tab']")
+      .attr('href'), '#id_tabs-with-form-three-initial-3',
+      "the new tab pane is active")
+
+    return
+  )
+
+  test("deleting initially existing form activates preceding tab header", ->
+    fixture = @fixtureTabsWithFormThreeInitial
+    formset = fixture.find('.tab-content').children().djangoFormset()
+    fixture.find(".nav :visible [data-toggle='tab']").last().trigger('click')
+
+    activeTab = fixture.find('.nav').children('.active')
+    formset.deleteForm(2)
+
+    equal(activeTab.filter('.active').length, 0,
+      "previously active tab header is now not active")
+
+    activeTab = fixture.find('.nav').children('.active')
+    equal(activeTab.find("[data-toggle='tab']").attr('href'),
+      "#id_tabs-with-form-three-initial-1",
+      "now active tab header is the preceding one")
+
+    return
+  )
+
+  test("deleting first initially existing form activates following tab header",
+    ->
+      fixture = @fixtureTabsWithFormThreeInitial
+      formset = fixture.find('.tab-content').children().djangoFormset()
+
+      activeTab = fixture.find('.nav').children('.active')
+      formset.deleteForm(0)
+
+      equal(activeTab.filter('.active').length, 0,
+        "first tab header is not active anymore")
+
+      activeTab = fixture.find('.nav').children('.active')
+      equal(activeTab.find("[data-toggle='tab']").attr('href'),
+        "#id_tabs-with-form-three-initial-1",
+        "following tab header is now active")
+
+      return
+  )
+
+  test("deleting the last tab deletes the tab header as well", ->
+    fixture = @fixtureTabsWithFormThreeInitial
+    formset = fixture.find('.tab-content').children().djangoFormset()
+
+    formset.deleteForm(2)
+    formset.deleteForm(1)
+    formset.deleteForm(0)
+
+    equal(fixture.find('.nav').children("[data-toggle='tab']:visible").length,
+      0, "no tab headers are visible")
+
+    return
+  )
+
+  test("forms not marked for deletion stay that way when creating the formset",
+    ->
+      fixture = @fixtureSimpleFormAsList
+      formset = fixture.children('ul').djangoFormset()
+
+      equal(fixture.find("[name='simple-form-as-list-0-DELETE']").val(),
+        '', "hidden field value is empty")
+
+      return
+  )
+
   module("jQuery#djangoFormset - unit tests", setup: moduleSetup)
 
   test("Form.getDeleteButtonContainer", ->
@@ -336,7 +425,7 @@
       "returns the last td as the container for table rows")
 
     equal(f.call(elem: @fixtureSimpleFormAsList.children().last())[0],
-      @fixtureSimpleFormAsList.children('ul').children('li')[1],
+      @fixtureSimpleFormAsList.children('ul').last().children('li').last()[0],
       "returns a new empty li at the end for lists")
 
     equal(f.call(elem: @fixtureSimpleList.children().last())[0],

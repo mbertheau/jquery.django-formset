@@ -38,35 +38,64 @@ class FormsetError extends Error
         throw new FormsetError("Management form field 'TOTAL_FORMS' not found
                                 for prefix #{@prefix}.")
 
-      @initialForms = $("#id_#{@prefix}-INITIAL_FORMS")
-      if @initialForms.length == 0
-        throw new FormsetError("Management form field 'INITIAL_FORMS' not found
-                                for prefix #{@prefix}.")
+      @_initTabs()
 
-      @forms = base.filter(':visible').map((index, element) =>
-        new $.fn.djangoFormset.Form($(element), this, index))
+      @forms = base.not('.empty-form').map((index, element) =>
+        tab = null
+        if @hasTabs
+          tabActivator = $.djangoFormset.getTabActivator(element.id)
+          tab = new $.fn.djangoFormset.Tab(tabActivator.closest('.nav > *'))
+        new $.fn.djangoFormset.Form($(element), this, index, tab))
 
       if @forms.length != parseInt(@totalForms.val())
         console.error("TOTAL_FORMS is #{@totalForms.val()}, but #{@forms.length}
-                      visible children found.")
+                      non-template elements found in passed selection.")
 
-      @insertAnchor = base.filter(':visible').last()
+      @initialForms = @forms.length
+
+      @insertAnchor = base.not('.empty-form').last()
       if @insertAnchor.length == 0
         @insertAnchor = @template
 
       return
 
+    _initTabs: ->
+      @hasTabs = @template.is('.tab-pane')
+      if not @hasTabs
+        return
+
+      tabNav = $.djangoFormset.getTabActivator(@template.attr('id'))
+        .closest('.nav')
+      #if tabNav.length == 0
+      #  throw new FormsetError("Template is .tab-pane but couldn't find
+      #                          corresponding .nav.")
+
+      @tabTemplate = tabNav.children('.empty-form')
+      #if @tabTemplate.length == 0
+      #  throw new FormsetError("Tab nav template not found (looking for
+      #                          .empty-form).")
+
+      return
+
     addForm: ->
+      if @hasTabs
+        newTabElem = @tabTemplate.clone().removeClass("empty-form")
+        newTab = new $.fn.djangoFormset.Tab(newTabElem)
+        lastForm = @forms[@forms.length - 1]
+        newTabElem.insertAfter(lastForm.tab.elem)
+
       newFormElem = @template.clone().removeClass("empty-form")
 
       newForm = new $.fn.djangoFormset.Form(newFormElem, this,
-        @totalForms.val())
-      @totalForms.val(parseInt(@totalForms.val()) + 1)
+        @totalForms.val(), newTab)
 
       newFormElem.insertAfter(@insertAnchor)
       @insertAnchor = newFormElem
       @forms.push(newForm)
 
+      @totalForms.val(parseInt(@totalForms.val()) + 1)
+      if @hasTabs
+        newTab.activate()
       $(this).trigger("formAdded", [newForm])
 
       newForm
@@ -78,6 +107,7 @@ class FormsetError extends Error
 
     handleFormRemoved: (index) ->
       @totalForms.val(parseInt(@totalForms.val()) - 1)
+      #form = @forms[index]
       @forms.splice(index, 1)
       for form, i in @forms
         form._updateFormIndex(i)
@@ -87,10 +117,12 @@ class FormsetError extends Error
       else
         @insertAnchor = @forms[@forms.length - 1].elem
 
+      #form.tab.remove()
+
       return
 
   class $.fn.djangoFormset.Form
-    constructor: (@elem, @formset, @index) ->
+    constructor: (@elem, @formset, @index, @tab) ->
       if @index isnt undefined
         @_initFormIndex(@index)
       deleteName = "#{@formset.prefix}-#{@index}-DELETE"
@@ -112,11 +144,21 @@ class FormsetError extends Error
         @elem
 
     delete: ->
-      isInitial = @index < parseInt(@formset.initialForms.val())
+      isInitial = @index < @formset.initialForms
 
       if isInitial
+        if @tab?
+          tabElems = @formset.forms.map((index, form) -> form.tab.elem[0])
+          nextTab = tabElems[...@index].filter(':visible').last()
+          if nextTab.length == 0
+            nextTab = tabElems[@index + 1..].filter(':visible').first()
+          if nextTab.length > 0
+            nextTab[0].tab.activate()
+          @tab.elem.hide()
+
         @deleteInput.val('on')
         @hide()
+
       else
         @elem.remove()
         @formset.handleFormRemoved(@index)
@@ -126,10 +168,11 @@ class FormsetError extends Error
       @elem.hide()
 
     _hideDeleteCheckbox: ->
-      @deleteInput.before("<input type='hidden'
-                                  name='#{@deleteInput.attr('name')}'
-                                  id='#{@deleteInput.attr('id')}'
-                                  value='#{@deleteInput.val()}'/>")
+      @deleteInput.before(
+        "<input type='hidden'
+                name='#{@deleteInput.attr('name')}'
+                id='#{@deleteInput.attr('id')}'
+                value='#{if @deleteInput.is(':checked') then 'on' else ''}'/>")
       newDeleteInput = @deleteInput.prev()
       # Remove any label for the delete checkbox
       @elem.find("label[for='#{@deleteInput.attr('id')}']").remove()
@@ -143,19 +186,45 @@ class FormsetError extends Error
 
     _replaceFormIndex: (oldIndexPattern, index) ->
       @index = index
-      prefixRegex = new RegExp("^(id_)?#{@formset.prefix}-#{oldIndexPattern}")
+
+      prefixRegex = new RegExp("#{@formset.prefix}-#{oldIndexPattern}")
       newPrefix = "#{@formset.prefix}-#{index}"
-      @elem.find('input,select,textarea,label').each(->
-        elem = $(this)
-        for attributeName in ['for', 'id'] when elem.attr(attributeName)
-          elem.attr(attributeName,
-                    elem.attr(attributeName).replace(prefixRegex,
-                                                     "id_#{newPrefix}"))
-        if elem.attr('name')
-          elem.attr('name',
-                    elem.attr('name').replace(prefixRegex, newPrefix))
+
+      _replaceFormIndexElement = (elem) ->
+        attributeNamesByTagName =
+          input: ['id', 'name']
+          select: ['id', 'name']
+          textarea: ['id', 'name']
+          label: ['for']
+          div: ['id']
+          '*': ['href', 'data-target']
+
+        tagName = elem.get(0).tagName
+        attributeNames = []
+        if tagName.toLowerCase() of attributeNamesByTagName
+          attributeNames = attributeNamesByTagName[tagName.toLowerCase()]
+
+        attributeNames.push(attributeNamesByTagName['*']...)
+
+        for attributeName in attributeNames
+          if elem.attr(attributeName)
+            elem.attr(attributeName,
+                      elem.attr(attributeName).replace(prefixRegex, newPrefix))
+
+      _replaceFormIndexElement(@elem)
+
+      @elem.find('input, select, textarea, label').each(->
+        _replaceFormIndexElement($(this))
         return
       )
+
+      if @tab?
+        _replaceFormIndexElement(@tab.elem)
+        @tab.elem.find('a, button').each(->
+          _replaceFormIndexElement($(this))
+          return
+        )
+
       return
 
     _initFormIndex: (index) ->
@@ -165,6 +234,20 @@ class FormsetError extends Error
     _updateFormIndex: (index) ->
       @_replaceFormIndex('\\d+', index)
       return
+
+  class $.fn.djangoFormset.Tab
+    constructor: (@elem) ->
+      @elem[0].tab = this
+
+    activate: ->
+      @elem.find("[data-toggle='tab']").trigger('click')
+
+    remove: ->
+      @elem.remove()
+
+  $.djangoFormset =
+    getTabActivator: (id) ->
+      $("[href='##{id}'], [data-target='##{id}']")
 
   return
 

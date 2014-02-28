@@ -1,4 +1,4 @@
-/*! Django Formset - v0.1.0 - 2014-02-26
+/*! Django Formset - v0.1.0 - 2014-02-28
 * https://github.com/mbertheau/jquery.django-formset
 * Copyright (c) 2014 Markus Bertheau; Licensed MIT */
 var FormsetError,
@@ -43,33 +43,56 @@ FormsetError = (function(_super) {
       if (this.totalForms.length === 0) {
         throw new FormsetError("Management form field 'TOTAL_FORMS' not found for prefix " + this.prefix + ".");
       }
-      this.initialForms = $("#id_" + this.prefix + "-INITIAL_FORMS");
-      if (this.initialForms.length === 0) {
-        throw new FormsetError("Management form field 'INITIAL_FORMS' not found for prefix " + this.prefix + ".");
-      }
-      this.forms = base.filter(':visible').map((function(_this) {
+      this._initTabs();
+      this.forms = base.not('.empty-form').map((function(_this) {
         return function(index, element) {
-          return new $.fn.djangoFormset.Form($(element), _this, index);
+          var tab, tabActivator;
+          tab = null;
+          if (_this.hasTabs) {
+            tabActivator = $.djangoFormset.getTabActivator(element.id);
+            tab = new $.fn.djangoFormset.Tab(tabActivator.closest('.nav > *'));
+          }
+          return new $.fn.djangoFormset.Form($(element), _this, index, tab);
         };
       })(this));
       if (this.forms.length !== parseInt(this.totalForms.val())) {
-        console.error("TOTAL_FORMS is " + (this.totalForms.val()) + ", but " + this.forms.length + " visible children found.");
+        console.error("TOTAL_FORMS is " + (this.totalForms.val()) + ", but " + this.forms.length + " non-template elements found in passed selection.");
       }
-      this.insertAnchor = base.filter(':visible').last();
+      this.initialForms = this.forms.length;
+      this.insertAnchor = base.not('.empty-form').last();
       if (this.insertAnchor.length === 0) {
         this.insertAnchor = this.template;
       }
       return;
     }
 
+    Formset.prototype._initTabs = function() {
+      var tabNav;
+      this.hasTabs = this.template.is('.tab-pane');
+      if (!this.hasTabs) {
+        return;
+      }
+      tabNav = $.djangoFormset.getTabActivator(this.template.attr('id')).closest('.nav');
+      this.tabTemplate = tabNav.children('.empty-form');
+    };
+
     Formset.prototype.addForm = function() {
-      var newForm, newFormElem;
+      var lastForm, newForm, newFormElem, newTab, newTabElem;
+      if (this.hasTabs) {
+        newTabElem = this.tabTemplate.clone().removeClass("empty-form");
+        newTab = new $.fn.djangoFormset.Tab(newTabElem);
+        lastForm = this.forms[this.forms.length - 1];
+        newTabElem.insertAfter(lastForm.tab.elem);
+      }
       newFormElem = this.template.clone().removeClass("empty-form");
-      newForm = new $.fn.djangoFormset.Form(newFormElem, this, this.totalForms.val());
-      this.totalForms.val(parseInt(this.totalForms.val()) + 1);
+      newForm = new $.fn.djangoFormset.Form(newFormElem, this, this.totalForms.val(), newTab);
       newFormElem.insertAfter(this.insertAnchor);
       this.insertAnchor = newFormElem;
       this.forms.push(newForm);
+      this.totalForms.val(parseInt(this.totalForms.val()) + 1);
+      if (this.hasTabs) {
+        newTab.activate();
+      }
       $(this).trigger("formAdded", [newForm]);
       return newForm;
     };
@@ -100,11 +123,12 @@ FormsetError = (function(_super) {
 
   })();
   $.fn.djangoFormset.Form = (function() {
-    function Form(elem, formset, index) {
+    function Form(elem, formset, index, tab) {
       var deleteName;
       this.elem = elem;
       this.formset = formset;
       this.index = index;
+      this.tab = tab;
       if (this.index !== void 0) {
         this._initFormIndex(this.index);
       }
@@ -129,9 +153,22 @@ FormsetError = (function(_super) {
     };
 
     Form.prototype["delete"] = function() {
-      var isInitial;
-      isInitial = this.index < parseInt(this.formset.initialForms.val());
+      var isInitial, nextTab, tabElems;
+      isInitial = this.index < this.formset.initialForms;
       if (isInitial) {
+        if (this.tab != null) {
+          tabElems = this.formset.forms.map(function(index, form) {
+            return form.tab.elem[0];
+          });
+          nextTab = tabElems.slice(0, this.index).filter(':visible').last();
+          if (nextTab.length === 0) {
+            nextTab = tabElems.slice(this.index + 1).filter(':visible').first();
+          }
+          if (nextTab.length > 0) {
+            nextTab[0].tab.activate();
+          }
+          this.tab.elem.hide();
+        }
         this.deleteInput.val('on');
         this.hide();
       } else {
@@ -146,7 +183,7 @@ FormsetError = (function(_super) {
 
     Form.prototype._hideDeleteCheckbox = function() {
       var newDeleteInput;
-      this.deleteInput.before("<input type='hidden' name='" + (this.deleteInput.attr('name')) + "' id='" + (this.deleteInput.attr('id')) + "' value='" + (this.deleteInput.val()) + "'/>");
+      this.deleteInput.before("<input type='hidden' name='" + (this.deleteInput.attr('name')) + "' id='" + (this.deleteInput.attr('id')) + "' value='" + (this.deleteInput.is(':checked') ? 'on' : '') + "'/>");
       newDeleteInput = this.deleteInput.prev();
       this.elem.find("label[for='" + (this.deleteInput.attr('id')) + "']").remove();
       this.deleteInput.remove();
@@ -164,24 +201,47 @@ FormsetError = (function(_super) {
     };
 
     Form.prototype._replaceFormIndex = function(oldIndexPattern, index) {
-      var newPrefix, prefixRegex;
+      var newPrefix, prefixRegex, _replaceFormIndexElement;
       this.index = index;
-      prefixRegex = new RegExp("^(id_)?" + this.formset.prefix + "-" + oldIndexPattern);
+      prefixRegex = new RegExp("" + this.formset.prefix + "-" + oldIndexPattern);
       newPrefix = "" + this.formset.prefix + "-" + index;
-      this.elem.find('input,select,textarea,label').each(function() {
-        var attributeName, elem, _i, _len, _ref;
-        elem = $(this);
-        _ref = ['for', 'id'];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          attributeName = _ref[_i];
+      _replaceFormIndexElement = function(elem) {
+        var attributeName, attributeNames, attributeNamesByTagName, tagName, _i, _len, _results;
+        attributeNamesByTagName = {
+          input: ['id', 'name'],
+          select: ['id', 'name'],
+          textarea: ['id', 'name'],
+          label: ['for'],
+          div: ['id'],
+          '*': ['href', 'data-target']
+        };
+        tagName = elem.get(0).tagName;
+        attributeNames = [];
+        if (tagName.toLowerCase() in attributeNamesByTagName) {
+          attributeNames = attributeNamesByTagName[tagName.toLowerCase()];
+        }
+        attributeNames.push.apply(attributeNames, attributeNamesByTagName['*']);
+        _results = [];
+        for (_i = 0, _len = attributeNames.length; _i < _len; _i++) {
+          attributeName = attributeNames[_i];
           if (elem.attr(attributeName)) {
-            elem.attr(attributeName, elem.attr(attributeName).replace(prefixRegex, "id_" + newPrefix));
+            _results.push(elem.attr(attributeName, elem.attr(attributeName).replace(prefixRegex, newPrefix)));
+          } else {
+            _results.push(void 0);
           }
         }
-        if (elem.attr('name')) {
-          elem.attr('name', elem.attr('name').replace(prefixRegex, newPrefix));
-        }
+        return _results;
+      };
+      _replaceFormIndexElement(this.elem);
+      this.elem.find('input, select, textarea, label').each(function() {
+        _replaceFormIndexElement($(this));
       });
+      if (this.tab != null) {
+        _replaceFormIndexElement(this.tab.elem);
+        this.tab.elem.find('a, button').each(function() {
+          _replaceFormIndexElement($(this));
+        });
+      }
     };
 
     Form.prototype._initFormIndex = function(index) {
@@ -195,6 +255,28 @@ FormsetError = (function(_super) {
     return Form;
 
   })();
+  $.fn.djangoFormset.Tab = (function() {
+    function Tab(elem) {
+      this.elem = elem;
+      this.elem[0].tab = this;
+    }
+
+    Tab.prototype.activate = function() {
+      return this.elem.find("[data-toggle='tab']").trigger('click');
+    };
+
+    Tab.prototype.remove = function() {
+      return this.elem.remove();
+    };
+
+    return Tab;
+
+  })();
+  $.djangoFormset = {
+    getTabActivator: function(id) {
+      return $("[href='#" + id + "'], [data-target='#" + id + "']");
+    }
+  };
 })(jQuery);
 
 //# sourceMappingURL=django-formset.js.map

@@ -11,6 +11,7 @@
     this.fixtureSimpleTable = allFixtures.find('#simple-table');
     this.fixtureDivWithForm = allFixtures.find('#div-with-form');
     this.fixtureDivWithFormOneInitial = allFixtures.find('#div-with-form-one-initial');
+    this.fixtureTabsWithFormThreeInitial = allFixtures.find('#tabs-with-form-three-initial');
     this.fixtureDivWithNestedFormsets = allFixtures.find('#div-with-nested-formsets');
   };
   module("jQuery#djangoFormset - functional tests", {
@@ -192,6 +193,53 @@
     nestedForm = form.children('div:visible').last();
     equal(nestedForm.children('input[type="text"]').attr('name'), 'div-with-nested-formsets-1-variant_set-0-inner', 'added inner form input has the prefix replaced with the correct id');
   });
+  test("Adds new tab pane and new tab nav after the last form", function() {
+    var fixture, formset, lastTabNav, lastTabPane;
+    fixture = this.fixtureTabsWithFormThreeInitial;
+    formset = fixture.find('.tab-content').children().djangoFormset();
+    lastTabPane = fixture.find('.tab-pane').last();
+    lastTabNav = fixture.find("[href='#" + (lastTabPane.attr('id')) + "']").closest('.nav > *');
+    formset.addForm();
+    equal(lastTabPane.next().attr('id'), 'id_tabs-with-form-three-initial-3', "tab pane with id 3 was added");
+    equal(lastTabNav.next().find('a').attr('href'), '#id_tabs-with-form-three-initial-3', "the last tab activates the newly added tab pane");
+    equal(fixture.find('.nav').children('.active').find("[data-toggle='tab']").attr('href'), '#id_tabs-with-form-three-initial-3', "the new tab pane is active");
+  });
+  test("deleting initially existing form activates preceding tab header", function() {
+    var activeTab, fixture, formset;
+    fixture = this.fixtureTabsWithFormThreeInitial;
+    formset = fixture.find('.tab-content').children().djangoFormset();
+    fixture.find(".nav :visible [data-toggle='tab']").last().trigger('click');
+    activeTab = fixture.find('.nav').children('.active');
+    formset.deleteForm(2);
+    equal(activeTab.filter('.active').length, 0, "previously active tab header is now not active");
+    activeTab = fixture.find('.nav').children('.active');
+    equal(activeTab.find("[data-toggle='tab']").attr('href'), "#id_tabs-with-form-three-initial-1", "now active tab header is the preceding one");
+  });
+  test("deleting first initially existing form activates following tab header", function() {
+    var activeTab, fixture, formset;
+    fixture = this.fixtureTabsWithFormThreeInitial;
+    formset = fixture.find('.tab-content').children().djangoFormset();
+    activeTab = fixture.find('.nav').children('.active');
+    formset.deleteForm(0);
+    equal(activeTab.filter('.active').length, 0, "first tab header is not active anymore");
+    activeTab = fixture.find('.nav').children('.active');
+    equal(activeTab.find("[data-toggle='tab']").attr('href'), "#id_tabs-with-form-three-initial-1", "following tab header is now active");
+  });
+  test("deleting the last tab deletes the tab header as well", function() {
+    var fixture, formset;
+    fixture = this.fixtureTabsWithFormThreeInitial;
+    formset = fixture.find('.tab-content').children().djangoFormset();
+    formset.deleteForm(2);
+    formset.deleteForm(1);
+    formset.deleteForm(0);
+    equal(fixture.find('.nav').children("[data-toggle='tab']:visible").length, 0, "no tab headers are visible");
+  });
+  test("forms not marked for deletion stay that way when creating the formset", function() {
+    var fixture, formset;
+    fixture = this.fixtureSimpleFormAsList;
+    formset = fixture.children('ul').djangoFormset();
+    equal(fixture.find("[name='simple-form-as-list-0-DELETE']").val(), '', "hidden field value is empty");
+  });
   module("jQuery#djangoFormset - unit tests", {
     setup: moduleSetup
   });
@@ -203,7 +251,7 @@
     })[0], this.fixtureSimpleTable.find('td')[0], "returns the last td as the container for table rows");
     equal(f.call({
       elem: this.fixtureSimpleFormAsList.children().last()
-    })[0], this.fixtureSimpleFormAsList.children('ul').children('li')[1], "returns a new empty li at the end for lists");
+    })[0], this.fixtureSimpleFormAsList.children('ul').last().children('li').last()[0], "returns a new empty li at the end for lists");
     equal(f.call({
       elem: this.fixtureSimpleList.children().last()
     })[0], this.fixtureSimpleList.children().last()[0], "returns the last child for all other elements");

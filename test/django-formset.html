@@ -7,10 +7,12 @@
   <script src="../libs/jquery-loader.js"></script>
   <!-- Load local QUnit. -->
   <link rel="stylesheet" href="../libs/qunit/qunit.css" media="screen">
+  <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
   <script src="../libs/qunit/qunit.js"></script>
   <!-- Load local lib and tests. -->
   <script src="../src/django-formset.js"></script>
   <script src="django-formset_test.js"></script>
+  <script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
   <!-- Removing access to jQuery and $. But it'll still be available as _$, if
        you REALLY want to mess around with jQuery in the console. REMEMBER WE
        ARE TESTING A PLUGIN HERE, THIS HELPS ENSURE BEST PRACTICES. REALLY. -->
@@ -18,6 +20,12 @@
   <style>
 #qunit-fixture .empty-form {
     display: none;
+}
+
+#qunit-fixture > * {
+  margin: 10px;
+  padding: 10px;
+  border: 1px solid blue;
 }
   </style>
 </head>
@@ -46,13 +54,21 @@
       </ul>
 
       <div id="simple-form-as-list">
-        <input id="id_simple-form-as-list-TOTAL_FORMS" name="simple-form-as-list-TOTAL_FORMS" type="hidden" value="3"/>
-        <input id="id_simple-form-as-list-INITIAL_FORMS" name="simple-form-as-list-INITIAL_FORMS" type="hidden" value="3"/>
+        <input id="id_simple-form-as-list-TOTAL_FORMS" name="simple-form-as-list-TOTAL_FORMS" type="hidden" value="1"/>
+        <input id="id_simple-form-as-list-INITIAL_FORMS" name="simple-form-as-list-INITIAL_FORMS" type="hidden" value="1"/>
         <ul class="empty-form">
           <li><input name='simple-form-as-list-__prefix__-text' type='text' value=''/></li>
+          <li>
+            <label for="id_simple-form-as-list-__prefix__-DELETE">Delete:</label>
+            <input id="id_simple-form-as-list-__prefix__-DELETE" name="simple-form-as-list-__prefix__-DELETE" type="checkbox">
+          </li>
         </ul>
         <ul>
           <li><input name='simple-form-as-list-0-text' type='text' value=''/></li>
+          <li>
+            <label for="id_simple-form-as-list-0-DELETE">Delete:</label>
+            <input id="id_simple-form-as-list-0-DELETE" name="simple-form-as-list-0-DELETE" type="checkbox">
+          </li>
         </ul>
       </div>
 
@@ -110,6 +126,35 @@
         </div>
         <input id="id_div-with-form-one-initial-INITIAL_FORMS" name="div-with-form-one-initial-INITIAL_FORMS" type="hidden" value="1"/>
         <input id="id_div-with-form-one-initial-MAX_NUM_FORMS" name="div-with-form-one-initial-MAX_NUM_FORMS" type="hidden" value="1000"/>
+      </div>
+
+      <div id="tabs-with-form-three-initial">
+        <input id="id_tabs-with-form-three-initial-TOTAL_FORMS" name="tabs-with-form-three-initial-TOTAL_FORMS" type="hidden" value="3"/>
+        <input id="id_tabs-with-form-three-initial-INITIAL_FORMS" name="tabs-with-form-three-initial-INITIAL_FORMS" type="hidden" value="3"/>
+        <input id="id_tabs-with-form-three-initial-MAX_NUM_FORMS" name="tabs-with-form-three-initial-MAX_NUM_FORMS" type="hidden" value="1000"/>
+
+        <ul class="nav nav-tabs">
+          <li class="empty-form"><a href="#id_tabs-with-form-three-initial-__prefix__" data-toggle="tab">__prefix__</a></li>
+          <li class="active"><a href="#id_tabs-with-form-three-initial-0" data-toggle="tab">0</a></li>
+          <li><a href="#id_tabs-with-form-three-initial-1" data-toggle="tab">1</a></li>
+          <li><a href="#id_tabs-with-form-three-initial-2" data-toggle="tab">2</a></li>
+          <li><a href="#this-is-the-add-another-tab-handle">Add another</a></li>
+        </ul>
+
+        <div class="tab-content">
+          <div class="tab-pane empty-form" id="id_tabs-with-form-three-initial-__prefix__">
+            <input name="tabs-with-form-three-initial-__prefix__-text" type="text"/>
+          </div>
+          <div class="tab-pane active" id="id_tabs-with-form-three-initial-0">
+            0<input name="tabs-with-form-three-initial-0-text" type="text"/>
+          </div>
+          <div class="tab-pane" id="id_tabs-with-form-three-initial-1">
+            1<input name="tabs-with-form-three-initial-1-text" type="text"/>
+          </div>
+          <div class="tab-pane" id="id_tabs-with-form-three-initial-2">
+            2<input name="tabs-with-form-three-initial-2-text" type="text"/>
+          </div>
+        </div>
       </div>
 
       <div id="div-with-nested-formsets">
