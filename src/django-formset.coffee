@@ -14,13 +14,15 @@ class FormsetError extends Error
     new $.fn.djangoFormset.Formset(this, options)
 
   class $.fn.djangoFormset.Formset
-    constructor: (base) ->
+    constructor: (base, options) ->
+      @opts = $.extend({}, $.fn.djangoFormset.defaultOptions, options)
       if base.length == 0
         throw new FormsetError("Empty selector.")
 
-      @template = base.filter(".empty-form")
+      @template = base.filter(".#{@opts.formTemplateClass}")
       if @template.length == 0
-        throw new FormsetError("Can't find template (looking for .empty-form)")
+        throw new FormsetError(
+          "Can't find template (looking for .#{@opts.formTemplateClass})")
 
       inputName = @template.find("input,select,textarea").first().attr('name')
       if not inputName
@@ -40,7 +42,7 @@ class FormsetError extends Error
 
       @_initTabs()
 
-      @forms = base.not('.empty-form').map((index, element) =>
+      @forms = base.not(".#{@opts.formTemplateClass}").map((index, element) =>
         if @hasTabs
           tabActivator = $.djangoFormset.getTabActivator(element.id)
           tab = new $.fn.djangoFormset.Tab(tabActivator.closest('.nav > *'))
@@ -52,7 +54,7 @@ class FormsetError extends Error
 
       @initialForms = @forms.length
 
-      @insertAnchor = base.not('.empty-form').last()
+      @insertAnchor = base.not(".#{@opts.formTemplateClass}").last()
       if @insertAnchor.length == 0
         @insertAnchor = @template
 
@@ -69,21 +71,23 @@ class FormsetError extends Error
       #  throw new FormsetError("Template is .tab-pane but couldn't find
       #                          corresponding .nav.")
 
-      @tabTemplate = tabNav.children('.empty-form')
+      @tabTemplate = tabNav.children(".#{@opts.formTemplateClass}")
       #if @tabTemplate.length == 0
       #  throw new FormsetError("Tab nav template not found (looking for
-      #                          .empty-form).")
+      #                          .#{@opts.formTemplateClass}).")
 
       return
 
     addForm: ->
       if @hasTabs
-        newTabElem = @tabTemplate.clone().removeClass("empty-form")
+        newTabElem = @tabTemplate.clone()
+          .removeClass(@opts.formTemplateClass)
         newTab = new $.fn.djangoFormset.Tab(newTabElem)
         lastForm = @forms[@forms.length - 1]
         newTabElem.insertAfter(lastForm.tab.elem)
 
-      newFormElem = @template.clone().removeClass("empty-form")
+      newFormElem = @template.clone()
+        .removeClass(@opts.formTemplateClass)
 
       newForm = new $.fn.djangoFormset.Form(newFormElem, this,
         parseInt(@totalForms.val()), newTab)
@@ -245,6 +249,9 @@ class FormsetError extends Error
 
     remove: ->
       @elem.remove()
+
+  $.fn.djangoFormset.defaultOptions =
+    formTemplateClass: 'empty-form'
 
   $.djangoFormset =
     getTabActivator: (id) ->

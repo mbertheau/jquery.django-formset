@@ -18,14 +18,15 @@ FormsetError = (function(_super) {
     return new $.fn.djangoFormset.Formset(this, options);
   };
   $.fn.djangoFormset.Formset = (function() {
-    function Formset(base) {
+    function Formset(base, options) {
       var inputName, placeholderPos;
+      this.opts = $.extend({}, $.fn.djangoFormset.defaultOptions, options);
       if (base.length === 0) {
         throw new FormsetError("Empty selector.");
       }
-      this.template = base.filter(".empty-form");
+      this.template = base.filter("." + this.opts.formTemplateClass);
       if (this.template.length === 0) {
-        throw new FormsetError("Can't find template (looking for .empty-form)");
+        throw new FormsetError("Can't find template (looking for ." + this.opts.formTemplateClass + ")");
       }
       inputName = this.template.find("input,select,textarea").first().attr('name');
       if (!inputName) {
@@ -41,7 +42,7 @@ FormsetError = (function(_super) {
         throw new FormsetError("Management form field 'TOTAL_FORMS' not found for prefix " + this.prefix + ".");
       }
       this._initTabs();
-      this.forms = base.not('.empty-form').map((function(_this) {
+      this.forms = base.not("." + this.opts.formTemplateClass).map((function(_this) {
         return function(index, element) {
           var tab, tabActivator;
           if (_this.hasTabs) {
@@ -55,7 +56,7 @@ FormsetError = (function(_super) {
         console.error("TOTAL_FORMS is " + (this.totalForms.val()) + ", but " + this.forms.length + " non-template elements found in passed selection.");
       }
       this.initialForms = this.forms.length;
-      this.insertAnchor = base.not('.empty-form').last();
+      this.insertAnchor = base.not("." + this.opts.formTemplateClass).last();
       if (this.insertAnchor.length === 0) {
         this.insertAnchor = this.template;
       }
@@ -69,18 +70,18 @@ FormsetError = (function(_super) {
         return;
       }
       tabNav = $.djangoFormset.getTabActivator(this.template.attr('id')).closest('.nav');
-      this.tabTemplate = tabNav.children('.empty-form');
+      this.tabTemplate = tabNav.children("." + this.opts.formTemplateClass);
     };
 
     Formset.prototype.addForm = function() {
       var lastForm, newForm, newFormElem, newTab, newTabElem;
       if (this.hasTabs) {
-        newTabElem = this.tabTemplate.clone().removeClass("empty-form");
+        newTabElem = this.tabTemplate.clone().removeClass(this.opts.formTemplateClass);
         newTab = new $.fn.djangoFormset.Tab(newTabElem);
         lastForm = this.forms[this.forms.length - 1];
         newTabElem.insertAfter(lastForm.tab.elem);
       }
-      newFormElem = this.template.clone().removeClass("empty-form");
+      newFormElem = this.template.clone().removeClass(this.opts.formTemplateClass);
       newForm = new $.fn.djangoFormset.Form(newFormElem, this, parseInt(this.totalForms.val()), newTab);
       newFormElem.insertAfter(this.insertAnchor);
       this.insertAnchor = newFormElem;
@@ -273,6 +274,9 @@ FormsetError = (function(_super) {
     return Tab;
 
   })();
+  $.fn.djangoFormset.defaultOptions = {
+    formTemplateClass: 'empty-form'
+  };
   $.djangoFormset = {
     getTabActivator: function(id) {
       return $("[href='#" + id + "'], [data-target='#" + id + "']");

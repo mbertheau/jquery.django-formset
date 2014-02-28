@@ -260,7 +260,9 @@
   test("forms not marked for deletion stay that way when creating the formset", function() {
     var fixture, formset;
     fixture = this.fixtureSimpleFormAsList;
-    formset = fixture.children('ul').djangoFormset();
+    formset = fixture.children('ul').djangoFormset({
+      formTemplateClass: "custom-template-class"
+    });
     equal(fixture.find("[name='simple-form-as-list-0-DELETE']").val(), '', "hidden field value is empty");
   });
   module("jQuery#djangoFormset - unit tests", {
