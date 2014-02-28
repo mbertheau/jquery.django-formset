@@ -204,17 +204,6 @@
     equal(lastTabNav.next().find('a').attr('href'), '#id_tabs-with-form-three-initial-3', "the last tab activates the newly added tab pane");
     equal(fixture.find('.nav').children('.active').find("[data-toggle='tab']").attr('href'), '#id_tabs-with-form-three-initial-3', "the new tab pane is active");
   });
-  test("deleting initially existing form activates preceding tab header", function() {
-    var activeTab, fixture, formset;
-    fixture = this.fixtureTabsWithFormThreeInitial;
-    formset = fixture.find('.tab-content').children().djangoFormset();
-    fixture.find(".nav :visible [data-toggle='tab']").last().trigger('click');
-    activeTab = fixture.find('.nav').children('.active');
-    formset.deleteForm(2);
-    equal(activeTab.filter('.active').length, 0, "previously active tab header is now not active");
-    activeTab = fixture.find('.nav').children('.active');
-    equal(activeTab.find("[data-toggle='tab']").attr('href'), "#id_tabs-with-form-three-initial-1", "now active tab header is the preceding one");
-  });
   test("deleting first initially existing form activates following tab header", function() {
     var activeTab, fixture, formset;
     fixture = this.fixtureTabsWithFormThreeInitial;
@@ -225,6 +214,28 @@
     activeTab = fixture.find('.nav').children('.active');
     equal(activeTab.find("[data-toggle='tab']").attr('href'), "#id_tabs-with-form-three-initial-1", "following tab header is now active");
   });
+  test("deleting middle initially existing form activates following tab header", function() {
+    var activeTab, fixture, formset;
+    fixture = this.fixtureTabsWithFormThreeInitial;
+    formset = fixture.find('.tab-content').children().djangoFormset();
+    fixture.find(".nav :visible [data-toggle='tab']").eq(1).trigger('click');
+    activeTab = fixture.find('.nav').children('.active');
+    formset.deleteForm(1);
+    equal(activeTab.filter('.active').length, 0, "previously active tab header is now not active");
+    activeTab = fixture.find('.nav').children('.active');
+    equal(activeTab.find("[data-toggle='tab']").attr('href'), "#id_tabs-with-form-three-initial-2", "now active tab header is the preceding one");
+  });
+  test("deleting last initially existing form activates preceding tab header", function() {
+    var activeTab, fixture, formset;
+    fixture = this.fixtureTabsWithFormThreeInitial;
+    formset = fixture.find('.tab-content').children().djangoFormset();
+    fixture.find(".nav :visible [data-toggle='tab']").last().trigger('click');
+    activeTab = fixture.find('.nav').children('.active');
+    formset.deleteForm(2);
+    equal(activeTab.filter('.active').length, 0, "previously active tab header is now not active");
+    activeTab = fixture.find('.nav').children('.active');
+    equal(activeTab.find("[data-toggle='tab']").attr('href'), "#id_tabs-with-form-three-initial-1", "now active tab header is the preceding one");
+  });
   test("deleting the last tab deletes the tab header as well", function() {
     var fixture, formset;
     fixture = this.fixtureTabsWithFormThreeInitial;
@@ -233,6 +244,18 @@
     formset.deleteForm(1);
     formset.deleteForm(0);
     equal(fixture.find('.nav').children("[data-toggle='tab']:visible").length, 0, "no tab headers are visible");
+  });
+  test('deleting new form hides current tab and activates following tab', function() {
+    var activeTab, fixture, formset;
+    fixture = this.fixtureTabsWithFormThreeInitial;
+    formset = fixture.find('.tab-content').children().djangoFormset();
+    fixture.find(".nav :visible [data-toggle='tab']").last().trigger('click');
+    formset.addForm();
+    formset.addForm();
+    fixture.find(".nav :visible [data-toggle='tab']").eq(3).trigger('click');
+    formset.deleteForm(3);
+    activeTab = fixture.find('.nav').children('.active');
+    equal(activeTab.find("[data-toggle='tab']").attr('href'), "#id_tabs-with-form-three-initial-3", "following tab header is now active");
   });
   test("forms not marked for deletion stay that way when creating the formset", function() {
     var fixture, formset;

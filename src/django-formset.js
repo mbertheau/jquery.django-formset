@@ -44,7 +44,6 @@ FormsetError = (function(_super) {
       this.forms = base.not('.empty-form').map((function(_this) {
         return function(index, element) {
           var tab, tabActivator;
-          tab = null;
           if (_this.hasTabs) {
             tabActivator = $.djangoFormset.getTabActivator(element.id);
             tab = new $.fn.djangoFormset.Tab(tabActivator.closest('.nav > *'));
@@ -82,7 +81,7 @@ FormsetError = (function(_super) {
         newTabElem.insertAfter(lastForm.tab.elem);
       }
       newFormElem = this.template.clone().removeClass("empty-form");
-      newForm = new $.fn.djangoFormset.Form(newFormElem, this, this.totalForms.val(), newTab);
+      newForm = new $.fn.djangoFormset.Form(newFormElem, this, parseInt(this.totalForms.val()), newTab);
       newFormElem.insertAfter(this.insertAnchor);
       this.insertAnchor = newFormElem;
       this.forms.push(newForm);
@@ -152,23 +151,28 @@ FormsetError = (function(_super) {
     Form.prototype["delete"] = function() {
       var isInitial, nextTab, tabElems;
       isInitial = this.index < this.formset.initialForms;
-      if (isInitial) {
-        if (this.tab != null) {
-          tabElems = this.formset.forms.map(function(index, form) {
-            return form.tab.elem[0];
-          });
+      if (this.tab) {
+        tabElems = this.formset.forms.map(function(index, form) {
+          return form.tab.elem[0];
+        });
+        nextTab = tabElems.slice(this.index + 1).filter(':visible').first();
+        if (nextTab.length === 0) {
           nextTab = tabElems.slice(0, this.index).filter(':visible').last();
-          if (nextTab.length === 0) {
-            nextTab = tabElems.slice(this.index + 1).filter(':visible').first();
-          }
-          if (nextTab.length > 0) {
-            nextTab[0].tab.activate();
-          }
+        }
+        if (nextTab.length > 0) {
+          nextTab[0].tab.activate();
+        }
+      }
+      if (isInitial) {
+        this.deleteInput.val('on');
+        if (this.tab) {
           this.tab.elem.hide();
         }
-        this.deleteInput.val('on');
         this.hide();
       } else {
+        if (this.tab) {
+          this.tab.elem.remove();
+        }
         this.elem.remove();
         this.formset.handleFormRemoved(this.index);
       }
@@ -233,7 +237,7 @@ FormsetError = (function(_super) {
       this.elem.find('input, select, textarea, label').each(function() {
         _replaceFormIndexElement($(this));
       });
-      if (this.tab != null) {
+      if (this.tab) {
         _replaceFormIndexElement(this.tab.elem);
         this.tab.elem.find('a, button').each(function() {
           _replaceFormIndexElement($(this));

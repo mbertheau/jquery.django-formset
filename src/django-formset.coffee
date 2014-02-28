@@ -41,7 +41,6 @@ class FormsetError extends Error
       @_initTabs()
 
       @forms = base.not('.empty-form').map((index, element) =>
-        tab = null
         if @hasTabs
           tabActivator = $.djangoFormset.getTabActivator(element.id)
           tab = new $.fn.djangoFormset.Tab(tabActivator.closest('.nav > *'))
@@ -87,7 +86,7 @@ class FormsetError extends Error
       newFormElem = @template.clone().removeClass("empty-form")
 
       newForm = new $.fn.djangoFormset.Form(newFormElem, this,
-        @totalForms.val(), newTab)
+        parseInt(@totalForms.val()), newTab)
 
       newFormElem.insertAfter(@insertAnchor)
       @insertAnchor = newFormElem
@@ -146,20 +145,22 @@ class FormsetError extends Error
     delete: ->
       isInitial = @index < @formset.initialForms
 
-      if isInitial
-        if @tab?
-          tabElems = @formset.forms.map((index, form) -> form.tab.elem[0])
+      if @tab
+        tabElems = @formset.forms.map((index, form) -> form.tab.elem[0])
+        nextTab = tabElems[@index + 1..].filter(':visible').first()
+        if nextTab.length == 0
           nextTab = tabElems[...@index].filter(':visible').last()
-          if nextTab.length == 0
-            nextTab = tabElems[@index + 1..].filter(':visible').first()
-          if nextTab.length > 0
-            nextTab[0].tab.activate()
-          @tab.elem.hide()
+        if nextTab.length > 0
+          nextTab[0].tab.activate()
 
+      if isInitial
         @deleteInput.val('on')
+        if @tab
+          @tab.elem.hide()
         @hide()
-
       else
+        if @tab
+          @tab.elem.remove()
         @elem.remove()
         @formset.handleFormRemoved(@index)
       return
@@ -218,7 +219,7 @@ class FormsetError extends Error
         return
       )
 
-      if @tab?
+      if @tab
         _replaceFormIndexElement(@tab.elem)
         @tab.elem.find('a, button').each(->
           _replaceFormIndexElement($(this))

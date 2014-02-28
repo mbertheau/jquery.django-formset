@@ -353,25 +353,6 @@
     return
   )
 
-  test("deleting initially existing form activates preceding tab header", ->
-    fixture = @fixtureTabsWithFormThreeInitial
-    formset = fixture.find('.tab-content').children().djangoFormset()
-    fixture.find(".nav :visible [data-toggle='tab']").last().trigger('click')
-
-    activeTab = fixture.find('.nav').children('.active')
-    formset.deleteForm(2)
-
-    equal(activeTab.filter('.active').length, 0,
-      "previously active tab header is now not active")
-
-    activeTab = fixture.find('.nav').children('.active')
-    equal(activeTab.find("[data-toggle='tab']").attr('href'),
-      "#id_tabs-with-form-three-initial-1",
-      "now active tab header is the preceding one")
-
-    return
-  )
-
   test("deleting first initially existing form activates following tab header",
     ->
       fixture = @fixtureTabsWithFormThreeInitial
@@ -391,6 +372,46 @@
       return
   )
 
+  test("deleting middle initially existing form activates following tab header",
+  ->
+    fixture = @fixtureTabsWithFormThreeInitial
+    formset = fixture.find('.tab-content').children().djangoFormset()
+    fixture.find(".nav :visible [data-toggle='tab']").eq(1).trigger('click')
+
+    activeTab = fixture.find('.nav').children('.active')
+    formset.deleteForm(1)
+
+    equal(activeTab.filter('.active').length, 0,
+      "previously active tab header is now not active")
+
+    activeTab = fixture.find('.nav').children('.active')
+    equal(activeTab.find("[data-toggle='tab']").attr('href'),
+      "#id_tabs-with-form-three-initial-2",
+      "now active tab header is the preceding one")
+
+    return
+  )
+
+  test("deleting last initially existing form activates preceding tab header",
+  ->
+    fixture = @fixtureTabsWithFormThreeInitial
+    formset = fixture.find('.tab-content').children().djangoFormset()
+    fixture.find(".nav :visible [data-toggle='tab']").last().trigger('click')
+
+    activeTab = fixture.find('.nav').children('.active')
+    formset.deleteForm(2)
+
+    equal(activeTab.filter('.active').length, 0,
+      "previously active tab header is now not active")
+
+    activeTab = fixture.find('.nav').children('.active')
+    equal(activeTab.find("[data-toggle='tab']").attr('href'),
+      "#id_tabs-with-form-three-initial-1",
+      "now active tab header is the preceding one")
+
+    return
+  )
+
   test("deleting the last tab deletes the tab header as well", ->
     fixture = @fixtureTabsWithFormThreeInitial
     formset = fixture.find('.tab-content').children().djangoFormset()
@@ -401,6 +422,24 @@
 
     equal(fixture.find('.nav').children("[data-toggle='tab']:visible").length,
       0, "no tab headers are visible")
+
+    return
+  )
+
+  test('deleting new form hides current tab and activates following tab', ->
+    fixture = @fixtureTabsWithFormThreeInitial
+    formset = fixture.find('.tab-content').children().djangoFormset()
+    fixture.find(".nav :visible [data-toggle='tab']").last().trigger('click')
+
+    formset.addForm()
+    formset.addForm()
+    fixture.find(".nav :visible [data-toggle='tab']").eq(3).trigger('click')
+    formset.deleteForm(3)
+
+    activeTab = fixture.find('.nav').children('.active')
+    equal(activeTab.find("[data-toggle='tab']").attr('href'),
+      "#id_tabs-with-form-three-initial-3",
+      "following tab header is now active")
 
     return
   )
