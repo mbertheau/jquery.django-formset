@@ -163,7 +163,7 @@ FormsetError = (function(_super) {
           nextTab = tabElems.slice(0, this.index).filter(':visible').last();
         }
         if (nextTab.length > 0) {
-          nextTab[0].tab.activate();
+          nextTab.data('djangoFormset.tab').activate();
         }
       }
       if (isInitial) {
@@ -262,7 +262,7 @@ FormsetError = (function(_super) {
   $.fn.djangoFormset.Tab = (function() {
     function Tab(elem) {
       this.elem = elem;
-      this.elem[0].tab = this;
+      this.elem.data('djangoFormset.tab', this);
     }
 
     Tab.prototype.activate = function() {

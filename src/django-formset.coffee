@@ -151,7 +151,7 @@ class FormsetError extends Error
         if nextTab.length == 0
           nextTab = tabElems[...@index].filter(':visible').last()
         if nextTab.length > 0
-          nextTab[0].tab.activate()
+          nextTab.data('djangoFormset.tab').activate()
 
       if isInitial
         @deleteInput.val('on')
@@ -238,7 +238,7 @@ class FormsetError extends Error
 
   class $.fn.djangoFormset.Tab
     constructor: (@elem) ->
-      @elem[0].tab = this
+      @elem.data('djangoFormset.tab', this)
 
     activate: ->
       @elem.find("[data-toggle='tab']").trigger('click')
