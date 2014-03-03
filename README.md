@@ -37,8 +37,8 @@ A simple formset as a list:
     </script>
 ```
 
-You have to create an "add another form" <button> or <a> yourself and on click call the `addForm`
-method on the object returned by `djangoFormset()`.
+You have to create an "add another form" `<button>` or `<a>` yourself and on click call the
+`addForm` method on the object returned by `djangoFormset()`.
 
 ### How it works
 
@@ -53,9 +53,9 @@ is always added after the last existing form, or after the form template, if the
 forms. Inside the new form in the attributes of the following elements the correct form index is
 put in place of `__prefix__`:
 
-    * `id` and `name` attributes of <input>, <select> and <textarea>
-    * `for` attribute of <label>
-    * `id` attribute of the form's root element if that's a <div>
+* `id` and `name` attributes of `<input>`, `<select>` and `<textarea>`
+* `for` attribute of `<label>`
+* `id` attribute of the form's root element if that's a `<div>`
 
 After adding the `formAdded` event is triggered to which you can attach a listener to do additional
 setup on the new form. The listener is passed the newly created form. The `elem` member of the form
@@ -120,13 +120,13 @@ A Bootstrap-tabbed formset:
 
 The tab functionality is triggered by the template form having the CSS class `tab-pane`.
 
-To find the tab navigation `djangoFormset` then looks for a child of a `.nav` that has an <a> or a
-<button> with a `href` or `data-target` that references the `id` of the form template root element.
-In the example that `id` is the form prefix.
+To find the tab navigation `djangoFormset` then looks for a child of a `.nav` that has an `<a>` or a
+`<button>` with a `href` or `data-target` that references the `id` of the form template root
+element.  In the example that `id` is the form prefix.
 
 When a new form is added a new tab is added after the last visible tab or after the template tab if
-there's no visible tab. Inside the tab the `href` and `data-target` attributes of <a> and <button>
-elements are updated to reflect the new form index.
+there's no visible tab. Inside the tab the `href` and `data-target` attributes of `<a>` and
+`<button>` elements are updated to reflect the new form index.
 
 When a form is deleted the tab is hidden or removed depending on whether the form existed at page
 load time or not.
@@ -135,4 +135,4 @@ load time or not.
 
 ### 2014-03-03: Version 0.1.0
 
-    * Initial release
+* Initial release
