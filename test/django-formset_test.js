@@ -273,6 +273,19 @@
     equal(fixture.find(".nav a[href='#id_tabs-with-form-three-initial-1']").closest('.nav > *').is(':visible'), false, "the tab header of the deleted form is not visible");
     equal(fixture.find("[name='tabs-with-form-three-initial-1-DELETE']").val(), "on", "the DELETE element has the value 'on'");
   });
+  test("Form without delete checkbox doesn't get delete button", function() {
+    var fixture, formset;
+    fixture = this.fixtureSimpleList;
+    formset = fixture.children('li').djangoFormset();
+    equal(fixture.find("button:contains('Delete')").length, 0, "There are no delete buttons in the fixture");
+  });
+  test("Form without delete checkbox can't be deleted programmatically", function() {
+    var fixture, formset;
+    fixture = this.fixtureSimpleList;
+    formset = fixture.children('li').djangoFormset();
+    formset.deleteForm(1);
+    equal(fixture.children('li:visible').length, 3, "there's still 3 visible forms");
+  });
   module("jQuery#djangoFormset - unit tests", {
     setup: moduleSetup
   });

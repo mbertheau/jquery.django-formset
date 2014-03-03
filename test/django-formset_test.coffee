@@ -472,6 +472,28 @@
     return
   )
 
+  test("Form without delete checkbox doesn't get delete button", ->
+    fixture = @fixtureSimpleList
+    formset = fixture.children('li').djangoFormset()
+
+    equal(fixture.find("button:contains('Delete')").length, 0,
+      "There are no delete buttons in the fixture")
+
+    return
+  )
+
+  test("Form without delete checkbox can't be deleted programmatically", ->
+    fixture = @fixtureSimpleList
+    formset = fixture.children('li').djangoFormset()
+
+    formset.deleteForm(1)
+
+    equal(fixture.children('li:visible').length, 3,
+      "there's still 3 visible forms")
+
+    return
+  )
+
   module("jQuery#djangoFormset - unit tests", setup: moduleSetup)
 
   test("Form.getDeleteButtonContainer", ->

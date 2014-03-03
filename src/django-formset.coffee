@@ -42,7 +42,10 @@ class FormsetError extends Error
 
       @_initTabs()
 
-      @forms = base.not(".#{@opts.formTemplateClass}").map((index, element) =>
+      forms = base.not(".#{@opts.formTemplateClass}")
+      @initialForms = forms.length
+
+      @forms = forms.map((index, element) =>
         if @hasTabs
           tabActivator = $.djangoFormset.getTabActivator(element.id)
           tab = new $.fn.djangoFormset.Tab(tabActivator.closest('.nav > *'))
@@ -51,8 +54,6 @@ class FormsetError extends Error
       if @forms.length != parseInt(@totalForms.val())
         console.error("TOTAL_FORMS is #{@totalForms.val()}, but #{@forms.length}
                       non-template elements found in passed selection.")
-
-      @initialForms = @forms.length
 
       deletedForms = @forms.filter(-> @deleteInput.val())
       deletedForms.each(-> @delete())
@@ -130,8 +131,10 @@ class FormsetError extends Error
         @_initFormIndex(@index)
       deleteName = "#{@formset.prefix}-#{@index}-DELETE"
       @deleteInput = @elem.find("input[name='#{deleteName}']")
-      @_hideDeleteCheckbox()
-      @_addDeleteButton()
+      isInitial = @index < @formset.initialForms
+      if @deleteInput.length > 0 or not isInitial
+        @_hideDeleteCheckbox()
+        @_addDeleteButton()
 
     getDeleteButton: ->
       $('<button type="button" class="btn btn-danger">
@@ -147,10 +150,14 @@ class FormsetError extends Error
         @elem
 
     delete: ->
+      if @deleteInput.length == 0
+        console.warn("Tried do delete non-deletable form #{@formset.prefix}
+                      ##{@index}.")
+        return
+
       isInitial = @index < @formset.initialForms
 
       if @tab
-        # TODO: activate other tab only if tab being deleted is currently active
         tabElems = @formset.forms.map((index, form) -> form.tab.elem[0])
         nextTab = tabElems[@index + 1..].filter(':visible').first()
         if nextTab.length == 0
@@ -174,12 +181,12 @@ class FormsetError extends Error
       @elem.hide()
 
     _hideDeleteCheckbox: ->
-      @deleteInput.before(
+      @elem.append(
         "<input type='hidden'
                 name='#{@deleteInput.attr('name')}'
                 id='#{@deleteInput.attr('id')}'
                 value='#{if @deleteInput.is(':checked') then 'on' else ''}'/>")
-      newDeleteInput = @deleteInput.prev()
+      newDeleteInput = @elem.children().last()
       # Remove any label for the delete checkbox
       @elem.find("label[for='#{@deleteInput.attr('id')}']").remove()
       @deleteInput.remove()

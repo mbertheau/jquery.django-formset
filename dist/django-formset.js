@@ -22,7 +22,7 @@ FormsetError = (function(_super) {
   };
   $.fn.djangoFormset.Formset = (function() {
     function Formset(base, options) {
-      var deletedForms, inputName, placeholderPos;
+      var deletedForms, forms, inputName, placeholderPos;
       this.opts = $.extend({}, $.fn.djangoFormset.defaultOptions, options);
       if (base.length === 0) {
         throw new FormsetError("Empty selector.");
@@ -45,7 +45,9 @@ FormsetError = (function(_super) {
         throw new FormsetError("Management form field 'TOTAL_FORMS' not found for prefix " + this.prefix + ".");
       }
       this._initTabs();
-      this.forms = base.not("." + this.opts.formTemplateClass).map((function(_this) {
+      forms = base.not("." + this.opts.formTemplateClass);
+      this.initialForms = forms.length;
+      this.forms = forms.map((function(_this) {
         return function(index, element) {
           var tab, tabActivator;
           if (_this.hasTabs) {
@@ -58,7 +60,6 @@ FormsetError = (function(_super) {
       if (this.forms.length !== parseInt(this.totalForms.val())) {
         console.error("TOTAL_FORMS is " + (this.totalForms.val()) + ", but " + this.forms.length + " non-template elements found in passed selection.");
       }
-      this.initialForms = this.forms.length;
       deletedForms = this.forms.filter(function() {
         return this.deleteInput.val();
       });
@@ -130,7 +131,7 @@ FormsetError = (function(_super) {
   })();
   $.fn.djangoFormset.Form = (function() {
     function Form(elem, formset, index, tab) {
-      var deleteName;
+      var deleteName, isInitial;
       this.elem = elem;
       this.formset = formset;
       this.index = index;
@@ -140,8 +141,11 @@ FormsetError = (function(_super) {
       }
       deleteName = "" + this.formset.prefix + "-" + this.index + "-DELETE";
       this.deleteInput = this.elem.find("input[name='" + deleteName + "']");
-      this._hideDeleteCheckbox();
-      this._addDeleteButton();
+      isInitial = this.index < this.formset.initialForms;
+      if (this.deleteInput.length > 0 || !isInitial) {
+        this._hideDeleteCheckbox();
+        this._addDeleteButton();
+      }
     }
 
     Form.prototype.getDeleteButton = function() {
@@ -160,6 +164,10 @@ FormsetError = (function(_super) {
 
     Form.prototype["delete"] = function() {
       var isInitial, nextTab, tabElems;
+      if (this.deleteInput.length === 0) {
+        console.warn("Tried do delete non-deletable form " + this.formset.prefix + " #" + this.index + ".");
+        return;
+      }
       isInitial = this.index < this.formset.initialForms;
       if (this.tab) {
         tabElems = this.formset.forms.map(function(index, form) {
@@ -194,8 +202,8 @@ FormsetError = (function(_super) {
 
     Form.prototype._hideDeleteCheckbox = function() {
       var newDeleteInput;
-      this.deleteInput.before("<input type='hidden' name='" + (this.deleteInput.attr('name')) + "' id='" + (this.deleteInput.attr('id')) + "' value='" + (this.deleteInput.is(':checked') ? 'on' : '') + "'/>");
-      newDeleteInput = this.deleteInput.prev();
+      this.elem.append("<input type='hidden' name='" + (this.deleteInput.attr('name')) + "' id='" + (this.deleteInput.attr('id')) + "' value='" + (this.deleteInput.is(':checked') ? 'on' : '') + "'/>");
+      newDeleteInput = this.elem.children().last();
       this.elem.find("label[for='" + (this.deleteInput.attr('id')) + "']").remove();
       this.deleteInput.remove();
       return this.deleteInput = newDeleteInput;
