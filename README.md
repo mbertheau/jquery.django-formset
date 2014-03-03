@@ -109,7 +109,7 @@ exceptions are raised.
 
     <script type="text/javascript">
         $(function() {
-            formset = $('#formset').find('tab-content > .tab-pane').djangoFormset();
+            formset = $('#formset').find('.tab-content > .tab-pane').djangoFormset();
             $('#formset').on('click', '.action-add-formset', function(event) {
                 /* set tab handle text */
                 form.tab.elem.find('a').text(form.index + 1);
