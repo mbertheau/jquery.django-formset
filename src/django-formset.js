@@ -1,22 +1,21 @@
-var FormsetError,
-  __hasProp = {}.hasOwnProperty,
+var __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-FormsetError = (function(_super) {
-  __extends(FormsetError, _super);
-
-  function FormsetError() {
-    return FormsetError.__super__.constructor.apply(this, arguments);
-  }
-
-  return FormsetError;
-
-})(Error);
-
 (function($) {
+  var FormsetError;
   $.fn.djangoFormset = function(options) {
     return new $.fn.djangoFormset.Formset(this, options);
   };
+  FormsetError = (function(_super) {
+    __extends(FormsetError, _super);
+
+    function FormsetError() {
+      return FormsetError.__super__.constructor.apply(this, arguments);
+    }
+
+    return FormsetError;
+
+  })(Error);
   $.fn.djangoFormset.Formset = (function() {
     function Formset(base, options) {
       var deletedForms, forms, inputName, placeholderPos;

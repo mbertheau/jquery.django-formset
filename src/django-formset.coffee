@@ -5,13 +5,16 @@
 # * Copyright (c) 2014 Markus Bertheau
 # * Licensed under the MIT license.
 #
-
-class FormsetError extends Error
+# * Heavily inspired by Stanislaus Madueke's django-dynamic-formset
+# * https://github.com/elo80ka/django-dynamic-formset
+#
 
 (($) ->
 
   $.fn.djangoFormset = (options) ->
     new $.fn.djangoFormset.Formset(this, options)
+
+  class FormsetError extends Error
 
   class $.fn.djangoFormset.Formset
     constructor: (base, options) ->
