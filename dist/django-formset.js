@@ -214,9 +214,10 @@ var __hasProp = {}.hasOwnProperty,
     };
 
     Form.prototype._hideDeleteCheckbox = function() {
-      var newDeleteInput;
-      this.elem.append("<input type='hidden' name='" + (this.deleteInput.attr('name')) + "' id='" + (this.deleteInput.attr('id')) + "' value='" + (this.deleteInput.is(':checked') ? 'on' : '') + "'/>");
-      newDeleteInput = this.elem.children().last();
+      var container, newDeleteInput;
+      container = this.getDeleteButtonContainer();
+      container.append("<input type='hidden' name='" + (this.deleteInput.attr('name')) + "' id='" + (this.deleteInput.attr('id')) + "' value='" + (this.deleteInput.is(':checked') ? 'on' : '') + "'/>");
+      newDeleteInput = container.children().last();
       this.elem.find("label[for='" + (this.deleteInput.attr('id')) + "']").remove();
       this.deleteInput.remove();
       return this.deleteInput = newDeleteInput;

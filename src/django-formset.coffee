@@ -191,12 +191,13 @@
       @elem.hide()
 
     _hideDeleteCheckbox: ->
-      @elem.append(
+      container = @getDeleteButtonContainer()
+      container.append(
         "<input type='hidden'
                 name='#{@deleteInput.attr('name')}'
                 id='#{@deleteInput.attr('id')}'
                 value='#{if @deleteInput.is(':checked') then 'on' else ''}'/>")
-      newDeleteInput = @elem.children().last()
+      newDeleteInput = container.children().last()
       # Remove any label for the delete checkbox
       @elem.find("label[for='#{@deleteInput.attr('id')}']").remove()
       @deleteInput.remove()
