@@ -157,7 +157,7 @@ class FormsetError extends Error
 
       isInitial = @index < @formset.initialForms
 
-      if @tab
+      if @tab and @tab.elem.is('.active')
         tabElems = @formset.forms.map((index, form) -> form.tab.elem[0])
         nextTab = tabElems[@index + 1..].filter(':visible').first()
         if nextTab.length == 0

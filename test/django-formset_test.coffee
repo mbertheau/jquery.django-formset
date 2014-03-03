@@ -381,7 +381,7 @@
     activeTab = fixture.find('.nav').children('.active')
     formset.deleteForm(1)
 
-    equal(activeTab.filter('.active').length, 0,
+    equal(activeTab.is('.active'), false,
       "previously active tab header is now not active")
 
     activeTab = fixture.find('.nav').children('.active')
@@ -412,7 +412,7 @@
     return
   )
 
-  test("deleting the last tab deletes the tab header as well", ->
+  test("deleting the only tab deletes the tab header as well", ->
     fixture = @fixtureTabsWithFormThreeInitial
     formset = fixture.find('.tab-content').children().djangoFormset()
 
@@ -440,6 +440,21 @@
     equal(activeTab.find("[data-toggle='tab']").attr('href'),
       "#id_tabs-with-form-three-initial-3",
       "following tab header is now active")
+
+    return
+  )
+
+  test("deleting a non-active tab doesn't change the active tab", ->
+    fixture = @fixtureTabsWithFormThreeInitial
+    formset = fixture.find('.tab-content').children().djangoFormset()
+
+    activeTab = fixture.find('.nav').children('.active')
+    formset.deleteForm(1)
+
+    activeTab = fixture.find('.nav').children('.active')
+    equal(activeTab.find("[data-toggle='tab']").attr('href'),
+      "#id_tabs-with-form-three-initial-0",
+      "active tab header is still the same")
 
     return
   )

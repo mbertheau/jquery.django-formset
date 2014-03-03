@@ -169,7 +169,7 @@ FormsetError = (function(_super) {
         return;
       }
       isInitial = this.index < this.formset.initialForms;
-      if (this.tab) {
+      if (this.tab && this.tab.elem.is('.active')) {
         tabElems = this.formset.forms.map(function(index, form) {
           return form.tab.elem[0];
         });

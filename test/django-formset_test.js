@@ -221,7 +221,7 @@
     fixture.find(".nav :visible [data-toggle='tab']").eq(1).trigger('click');
     activeTab = fixture.find('.nav').children('.active');
     formset.deleteForm(1);
-    equal(activeTab.filter('.active').length, 0, "previously active tab header is now not active");
+    equal(activeTab.is('.active'), false, "previously active tab header is now not active");
     activeTab = fixture.find('.nav').children('.active');
     equal(activeTab.find("[data-toggle='tab']").attr('href'), "#id_tabs-with-form-three-initial-2", "now active tab header is the preceding one");
   });
@@ -236,7 +236,7 @@
     activeTab = fixture.find('.nav').children('.active');
     equal(activeTab.find("[data-toggle='tab']").attr('href'), "#id_tabs-with-form-three-initial-1", "now active tab header is the preceding one");
   });
-  test("deleting the last tab deletes the tab header as well", function() {
+  test("deleting the only tab deletes the tab header as well", function() {
     var fixture, formset;
     fixture = this.fixtureTabsWithFormThreeInitial;
     formset = fixture.find('.tab-content').children().djangoFormset();
@@ -256,6 +256,15 @@
     formset.deleteForm(3);
     activeTab = fixture.find('.nav').children('.active');
     equal(activeTab.find("[data-toggle='tab']").attr('href'), "#id_tabs-with-form-three-initial-3", "following tab header is now active");
+  });
+  test("deleting a non-active tab doesn't change the active tab", function() {
+    var activeTab, fixture, formset;
+    fixture = this.fixtureTabsWithFormThreeInitial;
+    formset = fixture.find('.tab-content').children().djangoFormset();
+    activeTab = fixture.find('.nav').children('.active');
+    formset.deleteForm(1);
+    activeTab = fixture.find('.nav').children('.active');
+    equal(activeTab.find("[data-toggle='tab']").attr('href'), "#id_tabs-with-form-three-initial-0", "active tab header is still the same");
   });
   test("forms not marked for deletion stay that way when creating the formset", function() {
     var fixture, formset;
