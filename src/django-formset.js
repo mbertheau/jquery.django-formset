@@ -19,7 +19,7 @@ FormsetError = (function(_super) {
   };
   $.fn.djangoFormset.Formset = (function() {
     function Formset(base, options) {
-      var inputName, placeholderPos;
+      var deletedForms, inputName, placeholderPos;
       this.opts = $.extend({}, $.fn.djangoFormset.defaultOptions, options);
       if (base.length === 0) {
         throw new FormsetError("Empty selector.");
@@ -56,6 +56,12 @@ FormsetError = (function(_super) {
         console.error("TOTAL_FORMS is " + (this.totalForms.val()) + ", but " + this.forms.length + " non-template elements found in passed selection.");
       }
       this.initialForms = this.forms.length;
+      deletedForms = this.forms.filter(function() {
+        return this.deleteInput.val();
+      });
+      deletedForms.each(function() {
+        return this["delete"]();
+      });
       this.insertAnchor = base.not("." + this.opts.formTemplateClass).last();
       if (this.insertAnchor.length === 0) {
         this.insertAnchor = this.template;

@@ -456,6 +456,22 @@
       return
   )
 
+  test("Initially deleted form is hidden right away", ->
+    fixture = @fixtureTabsWithFormThreeInitial
+    fixture.find("input[name='tabs-with-form-three-initial-1-DELETE']")
+      .prop('checked', true)
+    formset = fixture.find('.tab-content').children().djangoFormset()
+
+    equal(fixture.find(".nav a[href='#id_tabs-with-form-three-initial-1']")
+      .closest('.nav > *').is(':visible'), false,
+      "the tab header of the deleted form is not visible")
+
+    equal(fixture.find("[name='tabs-with-form-three-initial-1-DELETE']").val(),
+      "on", "the DELETE element has the value 'on'")
+
+    return
+  )
+
   module("jQuery#djangoFormset - unit tests", setup: moduleSetup)
 
   test("Form.getDeleteButtonContainer", ->

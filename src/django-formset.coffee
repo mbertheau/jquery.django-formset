@@ -54,6 +54,9 @@ class FormsetError extends Error
 
       @initialForms = @forms.length
 
+      deletedForms = @forms.filter(-> @deleteInput.val())
+      deletedForms.each(-> @delete())
+
       @insertAnchor = base.not(".#{@opts.formTemplateClass}").last()
       if @insertAnchor.length == 0
         @insertAnchor = @template
@@ -110,7 +113,6 @@ class FormsetError extends Error
 
     handleFormRemoved: (index) ->
       @totalForms.val(parseInt(@totalForms.val()) - 1)
-      #form = @forms[index]
       @forms.splice(index, 1)
       for form, i in @forms
         form._updateFormIndex(i)
@@ -119,8 +121,6 @@ class FormsetError extends Error
         @insertAnchor = @template
       else
         @insertAnchor = @forms[@forms.length - 1].elem
-
-      #form.tab.remove()
 
       return
 
@@ -150,6 +150,7 @@ class FormsetError extends Error
       isInitial = @index < @formset.initialForms
 
       if @tab
+        # TODO: activate other tab only if tab being deleted is currently active
         tabElems = @formset.forms.map((index, form) -> form.tab.elem[0])
         nextTab = tabElems[@index + 1..].filter(':visible').first()
         if nextTab.length == 0

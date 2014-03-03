@@ -265,6 +265,14 @@
     });
     equal(fixture.find("[name='simple-form-as-list-0-DELETE']").val(), '', "hidden field value is empty");
   });
+  test("Initially deleted form is hidden right away", function() {
+    var fixture, formset;
+    fixture = this.fixtureTabsWithFormThreeInitial;
+    fixture.find("input[name='tabs-with-form-three-initial-1-DELETE']").prop('checked', true);
+    formset = fixture.find('.tab-content').children().djangoFormset();
+    equal(fixture.find(".nav a[href='#id_tabs-with-form-three-initial-1']").closest('.nav > *').is(':visible'), false, "the tab header of the deleted form is not visible");
+    equal(fixture.find("[name='tabs-with-form-three-initial-1-DELETE']").val(), "on", "the DELETE element has the value 'on'");
+  });
   module("jQuery#djangoFormset - unit tests", {
     setup: moduleSetup
   });
