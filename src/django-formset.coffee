@@ -69,16 +69,20 @@ class FormsetError extends Error
       if not @hasTabs
         return
 
-      tabNav = $.djangoFormset.getTabActivator(@template.attr('id'))
-        .closest('.nav')
-      #if tabNav.length == 0
-      #  throw new FormsetError("Template is .tab-pane but couldn't find
-      #                          corresponding .nav.")
+      tabActivator = $.djangoFormset.getTabActivator(@template.attr('id'))
+      if tabActivator.length == 0
+        throw new FormsetError("Template is .tab-pane but couldn't find
+                                corresponding tab activator.")
+
+      tabNav = tabActivator.closest('.nav')
+      if tabNav.length == 0
+        throw new FormsetError("Template is .tab-pane but couldn't find
+                                corresponding .nav.")
 
       @tabTemplate = tabNav.children(".#{@opts.formTemplateClass}")
-      #if @tabTemplate.length == 0
-      #  throw new FormsetError("Tab nav template not found (looking for
-      #                          .#{@opts.formTemplateClass}).")
+      if @tabTemplate.length == 0
+        throw new FormsetError("Tab nav template not found (looking for
+                                .#{@opts.formTemplateClass}).")
 
       return
 

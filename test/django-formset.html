@@ -128,6 +128,45 @@
         <input id="id_div-with-form-one-initial-MAX_NUM_FORMS" name="div-with-form-one-initial-MAX_NUM_FORMS" type="hidden" value="1000"/>
       </div>
 
+      <div id="tabs-without-tab-nav">
+        <input id="id_tabs-without-tab-nav-TOTAL_FORMS" name="tabs-without-tab-nav-TOTAL_FORMS" type="hidden" value="3"/>
+        <input id="id_tabs-without-tab-nav-INITIAL_FORMS" name="tabs-without-tab-nav-INITIAL_FORMS" type="hidden" value="3"/>
+        <input id="id_tabs-without-tab-nav-MAX_NUM_FORMS" name="tabs-without-tab-nav-MAX_NUM_FORMS" type="hidden" value="1000"/>
+
+        <div class="tab-content">
+          <div class="tab-pane empty-form" id="id_tabs-without-tab-nav-__prefix__">
+            <input name="tabs-without-tab-nav-__prefix__-text" type="text"/>
+            <label for="id_tabs-without-tab-nav-__prefix__-DELETE">Delete:</label>
+            <input id="id_tabs-without-tab-nav-__prefix__-DELETE" name="tabs-without-tab-nav-__prefix__-DELETE" type="checkbox">
+          </div>
+        </div>
+      </div>
+
+      <div id="tabs-no-tab-template">
+        <input id="id_tabs-no-tab-template-TOTAL_FORMS" name="tabs-no-tab-template-TOTAL_FORMS" type="hidden" value="1"/>
+        <input id="id_tabs-no-tab-template-INITIAL_FORMS" name="tabs-no-tab-template-INITIAL_FORMS" type="hidden" value="1"/>
+        <input id="id_tabs-no-tab-template-MAX_NUM_FORMS" name="tabs-no-tab-template-MAX_NUM_FORMS" type="hidden" value="1000"/>
+
+        <ul class="nav nav-tabs">
+          <li class="my-custom-template-class"><a href="#id_tabs-no-tab-template-__prefix__" data-toggle="tab">__prefix__</a></li>
+          <li class="active"><a href="#id_tabs-no-tab-template-0" data-toggle="tab">0</a></li>
+          <li><a href="#this-is-the-add-another-tab-handle">Add another</a></li>
+        </ul>
+
+        <div class="tab-content">
+          <div class="tab-pane empty-form" id="id_tabs-no-tab-template-__prefix__">
+            <input name="tabs-no-tab-template-__prefix__-text" type="text"/>
+            <label for="id_tabs-no-tab-template-__prefix__-DELETE">Delete:</label>
+            <input id="id_tabs-no-tab-template-__prefix__-DELETE" name="tabs-no-tab-template-__prefix__-DELETE" type="checkbox">
+          </div>
+          <div class="tab-pane active" id="id_tabs-no-tab-template-0">
+            0<input name="tabs-no-tab-template-0-text" type="text"/>
+            <label for="id_tabs-no-tab-template-0-DELETE">Delete:</label>
+            <input id="id_tabs-no-tab-template-0-DELETE" name="tabs-no-tab-template-0-DELETE" type="checkbox">
+          </div>
+        </div>
+      </div>
+
       <div id="tabs-with-form-three-initial">
         <input id="id_tabs-with-form-three-initial-TOTAL_FORMS" name="tabs-with-form-three-initial-TOTAL_FORMS" type="hidden" value="3"/>
         <input id="id_tabs-with-form-three-initial-INITIAL_FORMS" name="tabs-with-form-three-initial-INITIAL_FORMS" type="hidden" value="3"/>

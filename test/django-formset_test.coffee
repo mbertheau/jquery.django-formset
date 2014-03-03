@@ -35,6 +35,8 @@
       '#div-with-form-one-initial')
     @fixtureTabsWithFormThreeInitial = allFixtures.find(
       '#tabs-with-form-three-initial')
+    @fixtureTabsWithoutNav = allFixtures.find('#tabs-without-tab-nav')
+    @fixtureTabsNoTabTemplate = allFixtures.find('#tabs-no-tab-template')
     @fixtureDivWithNestedFormsets = allFixtures.find(
       '#div-with-nested-formsets')
     return
@@ -326,6 +328,22 @@
       'div-with-nested-formsets-1-variant_set-0-inner',
       'added inner form input has the prefix replaced with the correct id')
 
+    return
+  )
+
+  test("Throws on missing tab activator if form template is .tab-pane", ->
+    throws((->
+      @fixtureTabsWithoutNav.find('.tab-content > div').djangoFormset()),
+      /Template is .tab-pane but couldn't find corresponding tab activator./
+      "Doesn't complain about missing tab activator")
+    return
+  )
+
+  test("Throws on missing tab template", ->
+    throws((->
+      @fixtureTabsNoTabTemplate.find('.tab-content > div').djangoFormset()),
+      /Tab nav template not found \(looking for .empty-form\)./
+      "Doesn't complain about missing tab template")
     return
   )
 

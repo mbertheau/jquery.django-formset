@@ -12,6 +12,8 @@
     this.fixtureDivWithForm = allFixtures.find('#div-with-form');
     this.fixtureDivWithFormOneInitial = allFixtures.find('#div-with-form-one-initial');
     this.fixtureTabsWithFormThreeInitial = allFixtures.find('#tabs-with-form-three-initial');
+    this.fixtureTabsWithoutNav = allFixtures.find('#tabs-without-tab-nav');
+    this.fixtureTabsNoTabTemplate = allFixtures.find('#tabs-no-tab-template');
     this.fixtureDivWithNestedFormsets = allFixtures.find('#div-with-nested-formsets');
   };
   module("jQuery#djangoFormset - functional tests", {
@@ -192,6 +194,16 @@
     nestedFormset.addForm();
     nestedForm = form.children('div:visible').last();
     equal(nestedForm.children('input[type="text"]').attr('name'), 'div-with-nested-formsets-1-variant_set-0-inner', 'added inner form input has the prefix replaced with the correct id');
+  });
+  test("Throws on missing tab activator if form template is .tab-pane", function() {
+    throws((function() {
+      return this.fixtureTabsWithoutNav.find('.tab-content > div').djangoFormset();
+    }), /Template is .tab-pane but couldn't find corresponding tab activator./, "Doesn't complain about missing tab activator");
+  });
+  test("Throws on missing tab template", function() {
+    throws((function() {
+      return this.fixtureTabsNoTabTemplate.find('.tab-content > div').djangoFormset();
+    }), /Tab nav template not found \(looking for .empty-form\)./, "Doesn't complain about missing tab template");
   });
   test("Adds new tab pane and new tab nav after the last form", function() {
     var fixture, formset, lastTabNav, lastTabPane;

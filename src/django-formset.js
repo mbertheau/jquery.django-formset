@@ -71,13 +71,23 @@ FormsetError = (function(_super) {
     }
 
     Formset.prototype._initTabs = function() {
-      var tabNav;
+      var tabActivator, tabNav;
       this.hasTabs = this.template.is('.tab-pane');
       if (!this.hasTabs) {
         return;
       }
-      tabNav = $.djangoFormset.getTabActivator(this.template.attr('id')).closest('.nav');
+      tabActivator = $.djangoFormset.getTabActivator(this.template.attr('id'));
+      if (tabActivator.length === 0) {
+        throw new FormsetError("Template is .tab-pane but couldn't find corresponding tab activator.");
+      }
+      tabNav = tabActivator.closest('.nav');
+      if (tabNav.length === 0) {
+        throw new FormsetError("Template is .tab-pane but couldn't find corresponding .nav.");
+      }
       this.tabTemplate = tabNav.children("." + this.opts.formTemplateClass);
+      if (this.tabTemplate.length === 0) {
+        throw new FormsetError("Tab nav template not found (looking for ." + this.opts.formTemplateClass + ").");
+      }
     };
 
     Formset.prototype.addForm = function() {
