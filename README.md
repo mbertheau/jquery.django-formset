@@ -2,6 +2,9 @@
 
 Add new forms to Django form sets dynamically. Supports nested formsets and Bootstrap tabs.
 
+.. image:: https://secure.travis-ci.org/mbertheau/jquery.django-formset.png?branch=master
+    :target: http://travis-ci.org/#!/mbertheau/jquery.django-formset
+
 ## Getting Started
 Download the [production version][min] or the [development version][max].
 
@@ -10,7 +13,7 @@ Download the [production version][min] or the [development version][max].
 
 ## Examples
 
-A simple formset as a list:
+### A simple formset as a list
 
 ```html
     <ul id="formset">
@@ -71,7 +74,7 @@ Forms can be deleted from JavaScript by calling `deleteForm(index)` on the objec
 If something doesn't work have a look at the JavaScript console. For a number of error conditions
 exceptions are raised.
 
-A Bootstrap-tabbed formset:
+### A Bootstrap-tabbed formset
 
 ```html
     <div id="formset">
