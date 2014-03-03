@@ -136,6 +136,4 @@ load time or not.
 
 ## Release History
 
-### 2014-03-03: Version 0.1.0
-
-* Initial release
+No releases yet.
