@@ -11,6 +11,7 @@
     this.fixtureSimpleTable = allFixtures.find('#simple-table');
     this.fixtureDivWithForm = allFixtures.find('#div-with-form');
     this.fixtureDivWithFormOneInitial = allFixtures.find('#div-with-form-one-initial');
+    this.fixtureTabsNoInitialForms = allFixtures.find('#tabs-no-initial-forms');
     this.fixtureTabsWithFormThreeInitial = allFixtures.find('#tabs-with-form-three-initial');
     this.fixtureTabsWithoutNav = allFixtures.find('#tabs-without-tab-nav');
     this.fixtureTabsNoTabTemplate = allFixtures.find('#tabs-no-tab-template');
@@ -277,6 +278,14 @@
     formset.deleteForm(1);
     activeTab = fixture.find('.nav').children('.active');
     equal(activeTab.find("[data-toggle='tab']").attr('href'), "#id_tabs-with-form-three-initial-0", "active tab header is still the same");
+  });
+  test("Adding a new form to a tabbed formset without initial forms works", function() {
+    var fixture, formset;
+    fixture = this.fixtureTabsNoInitialForms;
+    formset = fixture.find('.tab-content > *').djangoFormset();
+    formset.addForm();
+    equal(fixture.find('.nav').children(':visible').length, 1, "there's one visible tab");
+    equal(fixture.find('.tab-content').children(':visible').length, 1, "there's one visible tab pane");
   });
   test("forms not marked for deletion stay that way when creating the formset", function() {
     var fixture, formset;

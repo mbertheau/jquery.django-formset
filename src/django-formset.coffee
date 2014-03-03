@@ -91,8 +91,11 @@ class FormsetError extends Error
         newTabElem = @tabTemplate.clone()
           .removeClass(@opts.formTemplateClass)
         newTab = new $.fn.djangoFormset.Tab(newTabElem)
-        lastForm = @forms[@forms.length - 1]
-        newTabElem.insertAfter(lastForm.tab.elem)
+        if @forms.length > 0
+          tabInsertAnchor = @forms[@forms.length - 1].tab.elem
+        else
+          tabInsertAnchor = @tabTemplate
+        newTabElem.insertAfter(tabInsertAnchor)
 
       newFormElem = @template.clone()
         .removeClass(@opts.formTemplateClass)

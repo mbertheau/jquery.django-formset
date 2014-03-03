@@ -91,12 +91,16 @@ FormsetError = (function(_super) {
     };
 
     Formset.prototype.addForm = function() {
-      var lastForm, newForm, newFormElem, newTab, newTabElem;
+      var newForm, newFormElem, newTab, newTabElem, tabInsertAnchor;
       if (this.hasTabs) {
         newTabElem = this.tabTemplate.clone().removeClass(this.opts.formTemplateClass);
         newTab = new $.fn.djangoFormset.Tab(newTabElem);
-        lastForm = this.forms[this.forms.length - 1];
-        newTabElem.insertAfter(lastForm.tab.elem);
+        if (this.forms.length > 0) {
+          tabInsertAnchor = this.forms[this.forms.length - 1].tab.elem;
+        } else {
+          tabInsertAnchor = this.tabTemplate;
+        }
+        newTabElem.insertAfter(tabInsertAnchor);
       }
       newFormElem = this.template.clone().removeClass(this.opts.formTemplateClass);
       newForm = new $.fn.djangoFormset.Form(newFormElem, this, parseInt(this.totalForms.val()), newTab);

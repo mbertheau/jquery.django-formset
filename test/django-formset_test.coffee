@@ -33,6 +33,7 @@
     @fixtureDivWithForm = allFixtures.find('#div-with-form')
     @fixtureDivWithFormOneInitial = allFixtures.find(
       '#div-with-form-one-initial')
+    @fixtureTabsNoInitialForms = allFixtures.find('#tabs-no-initial-forms')
     @fixtureTabsWithFormThreeInitial = allFixtures.find(
       '#tabs-with-form-three-initial')
     @fixtureTabsWithoutNav = allFixtures.find('#tabs-without-tab-nav')
@@ -473,6 +474,21 @@
     equal(activeTab.find("[data-toggle='tab']").attr('href'),
       "#id_tabs-with-form-three-initial-0",
       "active tab header is still the same")
+
+    return
+  )
+
+  test("Adding a new form to a tabbed formset without initial forms works", ->
+    fixture = @fixtureTabsNoInitialForms
+    formset = fixture.find('.tab-content > *').djangoFormset()
+
+    formset.addForm()
+
+    equal(fixture.find('.nav').children(':visible').length, 1,
+      "there's one visible tab")
+
+    equal(fixture.find('.tab-content').children(':visible').length, 1,
+      "there's one visible tab pane")
 
     return
   )
