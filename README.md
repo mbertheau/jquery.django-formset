@@ -15,28 +15,28 @@ Download the [production version][min] or the [development version][max].
 ### A simple formset as a list
 
 ```html
-    <ul id="formset">
-        {{ formset.management_form }}
-        {{ formset.non_form_errors }}
-        <li class="empty-form">
-            {{ formset.empty_form.as_p }}
+<ul id="formset">
+    {{ formset.management_form }}
+    {{ formset.non_form_errors }}
+    <li class="empty-form">
+        {{ formset.empty_form.as_p }}
+    </li>
+    {% for form in formset %}
+        <li>
+            {{ form.as_p }}
         </li>
-        {% for form in formset %}
-            <li>
-                {{ form.as_p }}
-            </li>
-        {% endfor %}
-    </ul>
-    <button type="button" class="action-add-formset"></button>
+    {% endfor %}
+</ul>
+<button type="button" class="action-add-formset"></button>
 
-    <script type="text/javascript">
-        $(function() {
-            formset = $('#formset').children('li').djangoFormset();
-            $('#formset').on('click', '.action-add-formset', function(event) {
-                formset.addForm();
-            });
+<script type="text/javascript">
+    $(function() {
+        formset = $('#formset').children('li').djangoFormset();
+        $('#formset').on('click', '.action-add-formset', function(event) {
+            formset.addForm();
         });
-    </script>
+    });
+</script>
 ```
 
 You have to create an "add another form" `<button>` or `<a>` yourself and on click call the
@@ -76,46 +76,46 @@ exceptions are raised.
 ### A Bootstrap-tabbed formset
 
 ```html
-    <div id="formset">
-        {{ formset.management_form }}
-        {{ formset.non_form_errors }}
-        <ul class="nav nav-tabs">
-            <li class="empty-form">
-                <a href="#{{ formset.empty_form.prefix }}" data-toggle="tab">New tab</a>
+<div id="formset">
+    {{ formset.management_form }}
+    {{ formset.non_form_errors }}
+    <ul class="nav nav-tabs">
+        <li class="empty-form">
+            <a href="#{{ formset.empty_form.prefix }}" data-toggle="tab">New tab</a>
+        </li>
+        {% for form in formset %}
+            <li class="{% if forloop.first %}active{% endif %}">
+                <a href="#{{ form.prefix }}" data-toggle="tab">{{ forloop.counter }}</a>
             </li>
-            {% for form in formset %}
-                <li class="{% if forloop.first %}active{% endif %}">
-                    <a href="#{{ form.prefix }}" data-toggle="tab">{{ forloop.counter }}</a>
-                </li>
-            {% endfor %}
-            <li>
-                <a class="btn action-add-formset">"Add another form</a>
-            </li>
-        </ul>
+        {% endfor %}
+        <li>
+            <a class="btn action-add-formset">"Add another form</a>
+        </li>
+    </ul>
 
-        <div class="tab-content form-inline">
-            <div class="tab-pane empty-form" id="{{ formset.empty_form.prefix }}">
-                {{ formset.empty_form.as_p }}
-            </div>
-            {% for form in formset %}
-                <div class="tab-pane{% if forloop.first %} active{% endif %}" id="{{ form.prefix }}">
-                    {% if form.instance.pk %}{{ form.DELETE }}{% endif %}
-                    {{ form.as_p }}
-                </div>
-            {% endfor %}
+    <div class="tab-content form-inline">
+        <div class="tab-pane empty-form" id="{{ formset.empty_form.prefix }}">
+            {{ formset.empty_form.as_p }}
         </div>
+        {% for form in formset %}
+            <div class="tab-pane{% if forloop.first %} active{% endif %}" id="{{ form.prefix }}">
+                {% if form.instance.pk %}{{ form.DELETE }}{% endif %}
+                {{ form.as_p }}
+            </div>
+        {% endfor %}
     </div>
+</div>
 
-    <script type="text/javascript">
-        $(function() {
-            formset = $('#formset').find('.tab-content > .tab-pane').djangoFormset();
-            $('#formset').on('click', '.action-add-formset', function(event) {
-                /* set tab handle text */
-                form.tab.elem.find('a').text(form.index + 1);
-                formset.addForm();
-            });
+<script type="text/javascript">
+    $(function() {
+        formset = $('#formset').find('.tab-content > .tab-pane').djangoFormset();
+        $('#formset').on('click', '.action-add-formset', function(event) {
+            /* set tab handle text */
+            form.tab.elem.find('a').text(form.index + 1);
+            formset.addForm();
         });
-    </script>
+    });
+</script>
 ```
 
 ### How it works
