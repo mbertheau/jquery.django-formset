@@ -2,8 +2,7 @@
 
 Add new forms to Django form sets dynamically. Supports nested formsets and Bootstrap tabs.
 
-.. image:: https://secure.travis-ci.org/mbertheau/jquery.django-formset.png?branch=master
-    :target: http://travis-ci.org/#!/mbertheau/jquery.django-formset
+[![Build Status](https://travis-ci.org/mbertheau/jquery.django-formset.png?branch=master)](https://travis-ci.org/mbertheau/jquery.django-formset)
 
 ## Getting Started
 Download the [production version][min] or the [development version][max].
