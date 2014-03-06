@@ -4,7 +4,6 @@ Add new forms to Django form sets dynamically. Supports nested formsets and Boot
 
 [![Build Status](https://travis-ci.org/mbertheau/jquery.django-formset.png?branch=master)](https://travis-ci.org/mbertheau/jquery.django-formset)
 
-## Getting Started
 Download the [production version][min] or the [development version][max].
 
 [min]: https://raw.github.com/mbertheau/jquery.django-formset/master/dist/django-formset.min.js
@@ -39,16 +38,18 @@ Download the [production version][min] or the [development version][max].
 </script>
 ```
 
-You have to create an "add another form" `<button>` or `<a>` yourself and on click call the
-`addForm` method on the object returned by `djangoFormset()`.
+You have to create an "add another form" `<button>` or `<a>` yourself somewhere and on click call
+the `addForm` method on the object returned by `djangoFormset()`.
 
 ### How it works
 
 Pass a jQuery selection of the form elements in your formset. One of the form elements must be a
-form template, and it must have the CSS class passed as option `formTemplateClass` (`empty-form` by
-default). That class should be styled to be invisible. The correct form prefix is derived from the
-name of the first form element in the form template. If a form includes a delete checkbox it is
-replaced with a delete button. Dynamically added forms always have a delete button.
+form template, and it must have the CSS class passed as option `formTemplateClass` (`'empty-form'`
+by default). That class should be styled to be invisible. The correct form prefix is derived from
+the name of the first form element in the form template. For every form a Form object is created. If
+a form includes a delete checkbox it is replaced with a delete button. Dynamically added forms
+always have a delete button. The form object is also accessible via `.data('djangoFormset.Form')` on
+the form element.
 
 When a form is added the template is copied and its `empty-form` CSS class is removed. The new form
 is always added after the last existing form, or after the form template, if there are no existing
@@ -60,15 +61,16 @@ put in place of `__prefix__`:
 * `id` attribute of the form's root element if that's a `<div>`
 
 After adding the `formAdded` event is triggered to which you can attach a listener to do additional
-setup on the new form. The listener is passed the newly created form. The `elem` member of the form
-object is the jquery object that contains the DOM node of the new form.
+setup on the new form. The listener is passed the newly created form object. The `elem` member of
+the form object is the jquery object that contains the DOM node of the new form.
 
 When a form is deleted that was dynamically added before, it is removed from the DOM completely and
 the remaining forms are renumbered. If a form is deleted that existed on page load, it is just
 hidden and marked as deleted.
 
-Forms can be deleted from JavaScript by calling `deleteForm(index)` on the object returned by
-`djangoFormset`. `index` is the 0-based form number. Hidden forms count towards this index as well.
+Forms can be deleted from JavaScript by calling `delete()` on the form object or `deleteForm(index)`
+on the object returned by `djangoFormset`. `index` is the 0-based form number. Hidden forms count
+towards this index as well.
 
 If something doesn't work have a look at the JavaScript console. For a number of error conditions
 exceptions are raised.
