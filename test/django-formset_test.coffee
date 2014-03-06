@@ -81,6 +81,9 @@
       "there's still exactly one template form")
     equal(@fixtureSimpleList.children(":visible").length, 4,
       "but now four visible templates")
+    equal(@fixtureSimpleList.children(":visible").last()
+      .data('djangoFormset.Form'), formset.forms[3],
+      "and the Form object is available as .data('djangoFormset.Form')")
 
     return
   )

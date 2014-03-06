@@ -43,6 +43,7 @@
     formset.addForm();
     equal(this.fixtureSimpleList.find(".empty-form").length, 1, "there's still exactly one template form");
     equal(this.fixtureSimpleList.children(":visible").length, 4, "but now four visible templates");
+    equal(this.fixtureSimpleList.children(":visible").last().data('djangoFormset.Form'), formset.forms[3], "and the Form object is available as .data('djangoFormset.Form')");
   });
   test("adds form at the end", function() {
     var formset, lastChild;

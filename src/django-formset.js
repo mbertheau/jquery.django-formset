@@ -146,6 +146,7 @@ var __hasProp = {}.hasOwnProperty,
       this.formset = formset;
       this.index = index;
       this.tab = tab;
+      this.elem.data('djangoFormset.Form', this);
       if (this.index !== void 0) {
         this._initFormIndex(this.index);
       }

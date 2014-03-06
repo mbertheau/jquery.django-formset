@@ -137,6 +137,7 @@
 
   class $.fn.djangoFormset.Form
     constructor: (@elem, @formset, @index, @tab) ->
+      @elem.data('djangoFormset.Form', this)
       if @index isnt undefined
         @_initFormIndex(@index)
       deleteName = "#{@formset.prefix}-#{@index}-DELETE"

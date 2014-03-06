@@ -1,4 +1,4 @@
-/*! Django Formset - v0.1.0 - 2014-03-03
+/*! Django Formset - v0.1.0 - 2014-03-06
 * https://github.com/mbertheau/jquery.django-formset
 * Copyright (c) 2014 Markus Bertheau; Licensed MIT */
 var __hasProp = {}.hasOwnProperty,
@@ -149,6 +149,7 @@ var __hasProp = {}.hasOwnProperty,
       this.formset = formset;
       this.index = index;
       this.tab = tab;
+      this.elem.data('djangoFormset.Form', this);
       if (this.index !== void 0) {
         this._initFormIndex(this.index);
       }
