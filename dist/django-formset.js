@@ -1,4 +1,4 @@
-/*! Django Formset - v0.1.0 - 2014-03-06
+/*! Django Formset - v0.1.0 - 2014-03-07
 * https://github.com/mbertheau/jquery.django-formset
 * Copyright (c) 2014 Markus Bertheau; Licensed MIT */
 var __hasProp = {}.hasOwnProperty,
@@ -157,8 +157,7 @@ var __hasProp = {}.hasOwnProperty,
       this.deleteInput = this.elem.find("input[name='" + deleteName + "']");
       isInitial = this.index < this.formset.initialForms;
       if (this.deleteInput.length > 0 || !isInitial) {
-        this._hideDeleteCheckbox();
-        this._addDeleteButton();
+        this._replaceDeleteCheckboxWithButton();
       }
     }
 
@@ -166,23 +165,21 @@ var __hasProp = {}.hasOwnProperty,
       return $('<button type="button" class="btn btn-danger"> Delete </button>');
     };
 
-    Form.prototype.getDeleteButtonContainer = function() {
-      if (this.elem.is('TR')) {
-        return this.elem.children().last();
-      } else if (this.elem.is('UL') || this.elem.is('OL')) {
-        return this.elem.append('li').children().last();
+    Form.prototype.insertDeleteButton = function() {
+      if (this.deleteInput.length > 0) {
+        this.deleteInput.after(this.deleteButton);
       } else {
-        return this.elem;
+        (this.elem.is('TR') ? this.elem.children().last() : this.elem.is('UL') || this.elem.is('OL') ? this.elem.append('li').children().last() : this.elem).append(this.deleteButton);
       }
     };
 
     Form.prototype["delete"] = function() {
       var isInitial, nextTab, tabElems;
-      if (this.deleteInput.length === 0) {
+      isInitial = this.index < this.formset.initialForms;
+      if (this.deleteInput.length === 0 && isInitial) {
         console.warn("Tried do delete non-deletable form " + this.formset.prefix + " #" + this.index + ".");
         return;
       }
-      isInitial = this.index < this.formset.initialForms;
       if (this.tab && this.tab.elem.is('.active')) {
         tabElems = this.formset.forms.map(function(index, form) {
           return form.tab.elem[0];
@@ -196,7 +193,9 @@ var __hasProp = {}.hasOwnProperty,
         }
       }
       if (isInitial) {
-        this.deleteInput.val('on');
+        if (this.deleteInput.length > 0) {
+          this.deleteInput.val('on');
+        }
         if (this.tab) {
           this.tab.elem.hide();
         }
@@ -214,24 +213,21 @@ var __hasProp = {}.hasOwnProperty,
       return this.elem.hide();
     };
 
-    Form.prototype._hideDeleteCheckbox = function() {
-      var container, newDeleteInput;
-      container = this.getDeleteButtonContainer();
-      container.append("<input type='hidden' name='" + (this.deleteInput.attr('name')) + "' id='" + (this.deleteInput.attr('id')) + "' value='" + (this.deleteInput.is(':checked') ? 'on' : '') + "'/>");
-      newDeleteInput = container.children().last();
-      this.elem.find("label[for='" + (this.deleteInput.attr('id')) + "']").remove();
-      this.deleteInput.remove();
-      return this.deleteInput = newDeleteInput;
-    };
-
-    Form.prototype._addDeleteButton = function() {
+    Form.prototype._replaceDeleteCheckboxWithButton = function() {
+      var newDeleteInput;
+      if (this.deleteInput.length > 0) {
+        newDeleteInput = $("<input type='hidden' name='" + (this.deleteInput.attr('name')) + "' id='" + (this.deleteInput.attr('id')) + "' value='" + (this.deleteInput.is(':checked') ? 'on' : '') + "'/>");
+        this.elem.find("label[for='" + (this.deleteInput.attr('id')) + "']").remove();
+        this.deleteInput.replaceWith(newDeleteInput);
+        this.deleteInput = newDeleteInput;
+      }
       this.deleteButton = this.getDeleteButton();
-      this.getDeleteButtonContainer().append(this.deleteButton);
-      return this.deleteButton.on('click', (function(_this) {
+      this.deleteButton.on('click', (function(_this) {
         return function(event) {
           return _this["delete"]();
         };
       })(this));
+      this.insertDeleteButton();
     };
 
     Form.prototype._replaceFormIndex = function(oldIndexPattern, index) {

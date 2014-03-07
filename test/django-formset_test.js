@@ -115,13 +115,14 @@
     checkDeleteButton(formset.forms[1]);
   });
   test("deletes form that was added before", function() {
-    var fixture, formset, _i, _len, _ref;
+    var fixture, form, formset, _i, _len, _ref;
     _ref = [this.fixtureDivWithFormOneInitial, this.fixtureDivWithNestedFormsets];
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       fixture = _ref[_i];
       formset = fixture.children('div').djangoFormset();
-      formset.addForm();
+      form = formset.addForm();
       equal(getTotalFormsValue(fixture, formset), 2, "for " + formset.prefix + ": TOTAL_FORMS is 2 now");
+      equal(form.elem.find("button:contains('Delete')").length, 1, "The added form has a delete button");
       formset.deleteForm(1);
       equal(fixture.children('div').length, 2, "for " + formset.prefix + ": the added form was deleted again");
       equal(getTotalFormsValue(fixture, formset), 1, "for " + formset.prefix + ": TOTAL_FORMS is back to 1 again");
@@ -316,22 +317,6 @@
     formset = fixture.children('li').djangoFormset();
     formset.deleteForm(1);
     equal(fixture.children('li:visible').length, 3, "there's still 3 visible forms");
-  });
-  module("jQuery#djangoFormset - unit tests", {
-    setup: moduleSetup
-  });
-  test("Form.getDeleteButtonContainer", function() {
-    var f;
-    f = $.fn.djangoFormset.Form.prototype.getDeleteButtonContainer;
-    equal(f.call({
-      elem: this.fixtureSimpleTable.find('tr')
-    })[0], this.fixtureSimpleTable.find('td')[0], "returns the last td as the container for table rows");
-    equal(f.call({
-      elem: this.fixtureSimpleFormAsList.children().last()
-    })[0], this.fixtureSimpleFormAsList.children('ul').last().children('li').last()[0], "returns a new empty li at the end for lists");
-    equal(f.call({
-      elem: this.fixtureSimpleList.children().last()
-    })[0], this.fixtureSimpleList.children().last()[0], "returns the last child for all other elements");
   });
 })(jQuery);
 

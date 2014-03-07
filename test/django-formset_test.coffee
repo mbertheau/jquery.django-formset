@@ -201,9 +201,11 @@
                     @fixtureDivWithNestedFormsets]
       formset = fixture.children('div').djangoFormset()
 
-      formset.addForm()
+      form = formset.addForm()
       equal(getTotalFormsValue(fixture, formset), 2,
         "for #{formset.prefix}: TOTAL_FORMS is 2 now")
+      equal(form.elem.find("button:contains('Delete')").length, 1,
+        "The added form has a delete button")
 
       formset.deleteForm(1)
 
@@ -542,25 +544,6 @@
 
     equal(fixture.children('li:visible').length, 3,
       "there's still 3 visible forms")
-
-    return
-  )
-
-  module("jQuery#djangoFormset - unit tests", setup: moduleSetup)
-
-  test("Form.getDeleteButtonContainer", ->
-    f = $.fn.djangoFormset.Form::getDeleteButtonContainer
-    equal(f.call(elem: @fixtureSimpleTable.find('tr'))[0],
-      @fixtureSimpleTable.find('td')[0],
-      "returns the last td as the container for table rows")
-
-    equal(f.call(elem: @fixtureSimpleFormAsList.children().last())[0],
-      @fixtureSimpleFormAsList.children('ul').last().children('li').last()[0],
-      "returns a new empty li at the end for lists")
-
-    equal(f.call(elem: @fixtureSimpleList.children().last())[0],
-      @fixtureSimpleList.children().last()[0],
-      "returns the last child for all other elements")
 
     return
   )

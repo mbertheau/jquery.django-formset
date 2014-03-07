@@ -49,7 +49,7 @@ by default). That class should be styled to be invisible. The correct form prefi
 the name of the first form element in the form template. For every form a Form object is created. If
 a form includes a delete checkbox it is replaced with a delete button. Dynamically added forms
 always have a delete button. The form object is also accessible via `.data('djangoFormset.Form')` on
-the form element.
+the any of the form elements.
 
 When a form is added the template is copied and its `empty-form` CSS class is removed. The new form
 is always added after the last existing form, or after the form template, if there are no existing

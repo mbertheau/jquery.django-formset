@@ -144,29 +144,33 @@
       @deleteInput = @elem.find("input[name='#{deleteName}']")
       isInitial = @index < @formset.initialForms
       if @deleteInput.length > 0 or not isInitial
-        @_hideDeleteCheckbox()
-        @_addDeleteButton()
+        @_replaceDeleteCheckboxWithButton()
 
     getDeleteButton: ->
       $('<button type="button" class="btn btn-danger">
            Delete
          </button>')
 
-    getDeleteButtonContainer: ->
-      if @elem.is('TR')
-        @elem.children().last()
-      else if @elem.is('UL') or @elem.is('OL')
-        @elem.append('li').children().last()
+    insertDeleteButton: ->
+      if @deleteInput.length > 0
+        @deleteInput.after(@deleteButton)
       else
-        @elem
+        (if @elem.is('TR')
+          @elem.children().last()
+        else if @elem.is('UL') or @elem.is('OL')
+          @elem.append('li').children().last()
+        else
+          @elem).append(@deleteButton)
+      return
 
     delete: ->
-      if @deleteInput.length == 0
+      isInitial = @index < @formset.initialForms
+
+      if @deleteInput.length == 0 and isInitial
         console.warn("Tried do delete non-deletable form #{@formset.prefix}
                       ##{@index}.")
         return
 
-      isInitial = @index < @formset.initialForms
 
       if @tab and @tab.elem.is('.active')
         tabElems = @formset.forms.map((index, form) -> form.tab.elem[0])
@@ -177,7 +181,8 @@
           nextTab.data('djangoFormset.tab').activate()
 
       if isInitial
-        @deleteInput.val('on')
+        if @deleteInput.length > 0
+          @deleteInput.val('on')
         if @tab
           @tab.elem.hide()
         @hide()
@@ -191,23 +196,22 @@
     hide: ->
       @elem.hide()
 
-    _hideDeleteCheckbox: ->
-      container = @getDeleteButtonContainer()
-      container.append(
-        "<input type='hidden'
-                name='#{@deleteInput.attr('name')}'
-                id='#{@deleteInput.attr('id')}'
-                value='#{if @deleteInput.is(':checked') then 'on' else ''}'/>")
-      newDeleteInput = container.children().last()
-      # Remove any label for the delete checkbox
-      @elem.find("label[for='#{@deleteInput.attr('id')}']").remove()
-      @deleteInput.remove()
-      @deleteInput = newDeleteInput
+    _replaceDeleteCheckboxWithButton: ->
+      if @deleteInput.length > 0
+        newDeleteInput = $("<input type='hidden'
+          name='#{@deleteInput.attr('name')}'
+          id='#{@deleteInput.attr('id')}'
+          value='#{if @deleteInput.is(':checked') then 'on' else ''}'/>")
 
-    _addDeleteButton: ->
+        # Remove any label for the delete checkbox
+        @elem.find("label[for='#{@deleteInput.attr('id')}']").remove()
+        @deleteInput.replaceWith(newDeleteInput)
+        @deleteInput = newDeleteInput
+
       @deleteButton = @getDeleteButton()
-      @getDeleteButtonContainer().append(@deleteButton)
       @deleteButton.on('click', (event) => @delete())
+      @insertDeleteButton()
+      return
 
     _replaceFormIndex: (oldIndexPattern, index) ->
       @index = index
