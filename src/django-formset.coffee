@@ -48,11 +48,16 @@
       forms = base.not(".#{@opts.formTemplateClass}")
       @initialForms = forms.length
 
+      $(this).on(@opts.on)
+
       @forms = forms.map((index, element) =>
         if @hasTabs
           tabActivator = $.djangoFormset.getTabActivator(element.id)
           tab = new @opts.tabClass(tabActivator.closest('.nav > *'))
-        new @opts.formClass($(element), this, index, tab))
+        newForm = new @opts.formClass($(element), this, index, tab)
+        $(this).trigger("formInitialized", [newForm])
+        newForm
+      )
 
       if @forms.length != parseInt(@totalForms.val())
         console.error("TOTAL_FORMS is #{@totalForms.val()}, but #{@forms.length}
@@ -113,6 +118,7 @@
       @totalForms.val(parseInt(@totalForms.val()) + 1)
       if @hasTabs
         newTab.activate()
+      $(this).trigger("formInitialized", [newForm])
       $(this).trigger("formAdded", [newForm])
 
       newForm

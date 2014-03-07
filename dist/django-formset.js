@@ -46,14 +46,17 @@ var __hasProp = {}.hasOwnProperty,
       this._initTabs();
       forms = base.not("." + this.opts.formTemplateClass);
       this.initialForms = forms.length;
+      $(this).on(this.opts.on);
       this.forms = forms.map((function(_this) {
         return function(index, element) {
-          var tab, tabActivator;
+          var newForm, tab, tabActivator;
           if (_this.hasTabs) {
             tabActivator = $.djangoFormset.getTabActivator(element.id);
             tab = new _this.opts.tabClass(tabActivator.closest('.nav > *'));
           }
-          return new _this.opts.formClass($(element), _this, index, tab);
+          newForm = new _this.opts.formClass($(element), _this, index, tab);
+          $(_this).trigger("formInitialized", [newForm]);
+          return newForm;
         };
       })(this));
       if (this.forms.length !== parseInt(this.totalForms.val())) {
@@ -113,6 +116,7 @@ var __hasProp = {}.hasOwnProperty,
       if (this.hasTabs) {
         newTab.activate();
       }
+      $(this).trigger("formInitialized", [newForm]);
       $(this).trigger("formAdded", [newForm]);
       return newForm;
     };

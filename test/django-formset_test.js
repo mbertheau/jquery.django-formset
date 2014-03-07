@@ -359,6 +359,23 @@ var __hasProp = {}.hasOwnProperty,
     tab = formset.forms[0].tab;
     equal(tab.elem.data('mycustomdata'), tab, "The custom Tab class was used");
   });
+  test("formInitialized is triggered for every existing and added form", function() {
+    var fixture, form, formset, index, _i, _len, _ref;
+    fixture = this.fixtureSimpleList;
+    formset = this.fixtureSimpleList.children('li').djangoFormset({
+      on: {
+        formInitialized: function(event, form) {
+          return form.myProp = "foo";
+        }
+      }
+    });
+    formset.addForm();
+    _ref = formset.forms;
+    for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
+      form = _ref[index];
+      equal(form.myProp, "foo", "Form #" + index + " has the custom property set");
+    }
+  });
 })(jQuery);
 
 //# sourceMappingURL=django-formset_test.js.map

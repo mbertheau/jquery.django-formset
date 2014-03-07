@@ -573,5 +573,23 @@
     equal(tab.elem.data('mycustomdata'), tab, "The custom Tab class was used")
     return
   )
+
+  test("formInitialized is triggered for every existing and added form", ->
+    fixture = @fixtureSimpleList
+    formset = @fixtureSimpleList.children('li').djangoFormset(
+      on:
+        formInitialized: (event, form) ->
+          form.myProp = "foo"
+    )
+
+    formset.addForm()
+
+    for form, index in formset.forms
+      equal(form.myProp, "foo", "Form ##{index} has the custom property set")
+
+    return
+  )
+
+
   return
 )(jQuery)
