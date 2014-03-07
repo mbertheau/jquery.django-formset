@@ -548,5 +548,30 @@
     return
   )
 
+  test("Form and Tab class can be replaced with a customized version", ->
+    class MyForm extends $.fn.djangoFormset.Form
+
+      getDeleteButton: ->
+        $('<button type="button" class="btn btn-danger my-delete-button-class">
+             Delete
+           </button>')
+
+    class MyTab extends $.fn.djangoFormset.Tab
+
+      constructor: (@elem) ->
+        super
+        @elem.data('mycustomdata', this)
+
+    fixture = @fixtureTabsWithFormThreeInitial
+    formset = fixture.find('.tab-content').children()
+      .djangoFormset(formClass: MyForm, tabClass: MyTab)
+    formset.addForm()
+
+    equal(fixture.find("button.my-delete-button-class:contains('Delete')")
+      .last().length, 1, "The custom getDeleteButton method was used")
+    tab = formset.forms[0].tab
+    equal(tab.elem.data('mycustomdata'), tab, "The custom Tab class was used")
+    return
+  )
   return
 )(jQuery)

@@ -51,8 +51,8 @@
       @forms = forms.map((index, element) =>
         if @hasTabs
           tabActivator = $.djangoFormset.getTabActivator(element.id)
-          tab = new $.fn.djangoFormset.Tab(tabActivator.closest('.nav > *'))
-        new $.fn.djangoFormset.Form($(element), this, index, tab))
+          tab = new @opts.tabClass(tabActivator.closest('.nav > *'))
+        new @opts.formClass($(element), this, index, tab))
 
       if @forms.length != parseInt(@totalForms.val())
         console.error("TOTAL_FORMS is #{@totalForms.val()}, but #{@forms.length}
@@ -93,7 +93,7 @@
       if @hasTabs
         newTabElem = @tabTemplate.clone()
           .removeClass(@opts.formTemplateClass)
-        newTab = new $.fn.djangoFormset.Tab(newTabElem)
+        newTab = new @opts.tabClass(newTabElem)
         if @forms.length > 0
           tabInsertAnchor = @forms[@forms.length - 1].tab.elem
         else
@@ -103,7 +103,7 @@
       newFormElem = @template.clone()
         .removeClass(@opts.formTemplateClass)
 
-      newForm = new $.fn.djangoFormset.Form(newFormElem, this,
+      newForm = new @opts.formClass(newFormElem, this,
         parseInt(@totalForms.val()), newTab)
 
       newFormElem.insertAfter(@insertAnchor)
@@ -276,6 +276,8 @@
 
   $.fn.djangoFormset.defaultOptions =
     formTemplateClass: 'empty-form'
+    formClass: $.fn.djangoFormset.Form
+    tabClass: $.fn.djangoFormset.Tab
 
   $.djangoFormset =
     getTabActivator: (id) ->

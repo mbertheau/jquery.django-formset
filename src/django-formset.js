@@ -48,9 +48,9 @@ var __hasProp = {}.hasOwnProperty,
           var tab, tabActivator;
           if (_this.hasTabs) {
             tabActivator = $.djangoFormset.getTabActivator(element.id);
-            tab = new $.fn.djangoFormset.Tab(tabActivator.closest('.nav > *'));
+            tab = new _this.opts.tabClass(tabActivator.closest('.nav > *'));
           }
-          return new $.fn.djangoFormset.Form($(element), _this, index, tab);
+          return new _this.opts.formClass($(element), _this, index, tab);
         };
       })(this));
       if (this.forms.length !== parseInt(this.totalForms.val())) {
@@ -93,7 +93,7 @@ var __hasProp = {}.hasOwnProperty,
       var newForm, newFormElem, newTab, newTabElem, tabInsertAnchor;
       if (this.hasTabs) {
         newTabElem = this.tabTemplate.clone().removeClass(this.opts.formTemplateClass);
-        newTab = new $.fn.djangoFormset.Tab(newTabElem);
+        newTab = new this.opts.tabClass(newTabElem);
         if (this.forms.length > 0) {
           tabInsertAnchor = this.forms[this.forms.length - 1].tab.elem;
         } else {
@@ -102,7 +102,7 @@ var __hasProp = {}.hasOwnProperty,
         newTabElem.insertAfter(tabInsertAnchor);
       }
       newFormElem = this.template.clone().removeClass(this.opts.formTemplateClass);
-      newForm = new $.fn.djangoFormset.Form(newFormElem, this, parseInt(this.totalForms.val()), newTab);
+      newForm = new this.opts.formClass(newFormElem, this, parseInt(this.totalForms.val()), newTab);
       newFormElem.insertAfter(this.insertAnchor);
       this.insertAnchor = newFormElem;
       this.forms.push(newForm);
@@ -300,7 +300,9 @@ var __hasProp = {}.hasOwnProperty,
 
   })();
   $.fn.djangoFormset.defaultOptions = {
-    formTemplateClass: 'empty-form'
+    formTemplateClass: 'empty-form',
+    formClass: $.fn.djangoFormset.Form,
+    tabClass: $.fn.djangoFormset.Tab
   };
   $.djangoFormset = {
     getTabActivator: function(id) {

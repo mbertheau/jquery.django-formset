@@ -1,3 +1,6 @@
+var __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
 (function($) {
   var getTotalFormsValue, moduleSetup;
   moduleSetup = function() {
@@ -317,6 +320,44 @@
     formset = fixture.children('li').djangoFormset();
     formset.deleteForm(1);
     equal(fixture.children('li:visible').length, 3, "there's still 3 visible forms");
+  });
+  test("Form and Tab class can be replaced with a customized version", function() {
+    var MyForm, MyTab, fixture, formset, tab;
+    MyForm = (function(_super) {
+      __extends(MyForm, _super);
+
+      function MyForm() {
+        return MyForm.__super__.constructor.apply(this, arguments);
+      }
+
+      MyForm.prototype.getDeleteButton = function() {
+        return $('<button type="button" class="btn btn-danger my-delete-button-class"> Delete </button>');
+      };
+
+      return MyForm;
+
+    })($.fn.djangoFormset.Form);
+    MyTab = (function(_super) {
+      __extends(MyTab, _super);
+
+      function MyTab(elem) {
+        this.elem = elem;
+        MyTab.__super__.constructor.apply(this, arguments);
+        this.elem.data('mycustomdata', this);
+      }
+
+      return MyTab;
+
+    })($.fn.djangoFormset.Tab);
+    fixture = this.fixtureTabsWithFormThreeInitial;
+    formset = fixture.find('.tab-content').children().djangoFormset({
+      formClass: MyForm,
+      tabClass: MyTab
+    });
+    formset.addForm();
+    equal(fixture.find("button.my-delete-button-class:contains('Delete')").last().length, 1, "The custom getDeleteButton method was used");
+    tab = formset.forms[0].tab;
+    equal(tab.elem.data('mycustomdata'), tab, "The custom Tab class was used");
   });
 })(jQuery);
 

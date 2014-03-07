@@ -58,7 +58,7 @@ module.exports = function(grunt) {
                                      'spacing': {'left': 0, 'right': 1}},
         'cyclomatic_complexity': {'level': 'warn'},
         'line_endings': {'level': 'error'},
-        'newlines_after_classes': {'level': 'error'},
+        'newlines_after_classes': {'level': 'error', 'value': 1},
         'no_empty_param_list': {'level': 'error'},
         'no_implicit_parens': {'level': 'error'},
         'no_standalone_at': {'level': 'error'},
