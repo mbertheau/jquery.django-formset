@@ -87,7 +87,9 @@ exceptions are raised.
         </li>
         {% for form in formset %}
             <li class="{% if forloop.first %}active{% endif %}">
-                <a href="#{{ form.prefix }}" data-toggle="tab">{{ forloop.counter }}</a>
+                <a href="#{{ form.prefix }}" data-toggle="tab">
+                    {{ forloop.counter }}
+                </a>
             </li>
         {% endfor %}
         <li>
@@ -100,7 +102,8 @@ exceptions are raised.
             {{ formset.empty_form.as_p }}
         </div>
         {% for form in formset %}
-            <div class="tab-pane{% if forloop.first %} active{% endif %}" id="{{ form.prefix }}">
+            <div class="tab-pane{% if forloop.first %} active{% endif %}"
+                 id="{{ form.prefix }}">
                 {% if form.instance.pk %}{{ form.DELETE }}{% endif %}
                 {{ form.as_p }}
             </div>
@@ -135,6 +138,128 @@ there's no visible tab. Inside the tab the `href` and `data-target` attributes o
 When a form is deleted the tab is hidden or removed depending on whether the form existed at page
 load time or not.
 
+### A nested Bootstrap-tabbed formset
+
+Use the python package [django-nested-formset] for the Django side of things.
+
+[django-nested-formset]: https://pypi.python.org/pypi/django-nested-formset
+
+In the view:
+
+```python
+formset_class = nestedformset_factory(
+    models.Block,
+    models.Building,
+    nested_formset=inlineformset_factory(models.Building, models.Tenant),
+)
+```
+
+In the template:
+```html
+{{ outer_formset.management_form }}
+{{ outer_formset.non_form_errors }}
+<ul class="nav nav-tabs">
+    <li class="empty-form">
+        <a href="#{{ outer_formset.empty_form.prefix }}" data-toggle="tab">New tab</a>
+    </li>
+    {% for outer_form in outer_formset %}
+        <li class="{% if forloop.first %}active{% endif %}">
+            <a href="#{{ outer_form.prefix }}" data-toggle="tab">Existing tab</a>
+        </li>
+    {% endfor %}
+    <li>
+        <a class="btn action-add-outer-form">{% trans "Add another outer form" %}</a>
+    </li>
+</ul>
+
+<div class="tab-content">
+    <div class="tab-pane empty-form" id="{{ outer_formset.empty_form.prefix }}">
+        <div>
+            {{ outer_formset.empty_form.nested.management_form }}
+            <div class="empty-form">
+                {{ outer_formset.empty_form.nested.empty_form.as_p }}
+            </div>
+            {% for inner_form in outer_formset.empty_form.nested %}
+                <div>
+                    {{ inner_form.as_p }}
+                </div>
+            {% endfor %}
+        </div>
+        <div>
+            {{ outer_formset.empty_form.as_p }}
+        </div>
+    </div>
+    {% for outer_form in outer_formset %}
+        <div class="tab-pane{% if forloop.first %} active{% endif %}"
+             id="{{ outer_form.prefix }}">
+            <div>
+                {{ outer_form.nested.management_form }}
+                {{ outer_form.nested.non_form_errors }}
+                <div class="empty-form">
+                    {{ outer_form.nested.empty_form.as_p }}
+                </div>
+                {% for inner_form in outer_form.nested %}
+                    <div>
+                        {{ inner_form.as_p }}
+                    </div>
+                {% endfor %}
+                <button type="button" class="btn btn-primary action-add-inner-form">
+                    Add another inner form
+                </button>
+            </div>
+            <div>
+                {{ outer_form.as_p }}
+            </div>
+        </div>
+    {% endfor %}
+    <div class="actions">
+        <button type="button" class="btn btn-primary action-add-outer-form">
+            Add another outer form
+        </button>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var outerFormset = $("div.tab-content > div.tab-pane").not('.actions')
+        .djangoFormset({
+        on: {
+            formInitialized: function(event, form) {
+                /* Init inner formset */
+                var innerFormsetElem = form.elem.children('div').first();
+                var innerFormset = innerFormsetElem.children('div').djangoFormset();
+                innerFormsetElem.on('click', '.action-add-inner-form', function(event) {
+                    innerFormset.addForm();
+                });
+            },
+            formAdded: function(event, form) {
+                /* Optionally set tab header text on new forms */
+                form.tab.elem.find('a').text("Form number " + (form.index + 1));
+            }
+        }
+    });
+    /* Add new outer form on add button click */
+    $().on('click', '.action-add-outer-form', function(event) {
+        outerFormset.addForm();
+    });
+    /* Optionally update tab label based on input value */
+    $().on('change', 'input:not([name*="__prefix__"]):first', function() {
+        var tabLabel = "First input value is " + $(this).val();
+        form = $(this).closest('.tab-pane').data('djangoFormset.Form');
+        form.tab.elem.find('a').text(tabLabel);
+    });
+</script>
+```
+
+### How it works
+
+The plugin takes care to replace just the first occurrence of the template marker `__prefix__`. It
+also is careful not to leave the boundaries of the current form instance when it applies the needed
+modifications to the DOM. Lastly it provides events to hook up the initialization of the inner
+formset.
+
+I haven't tried it, but more than one nesting level should work just as fine.
+
 ## Release History
 
-No releases yet.
+I'll leave this unreleased for a while until the plugin had some exposure to make sure it doesn't
+have any nasty bugs. (2014-03-07)
