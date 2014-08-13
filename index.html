@@ -1,1 +1,324 @@
-Demo
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title>Jquery.django-formset by mbertheau</title>
+  </head>
+
+  <body>
+    <header>
+      <div class="inner">
+        <h1>Jquery.django-formset</h1>
+        <h2>Dynamic formsets for Django</h2>
+        <a href="https://github.com/mbertheau/jquery.django-formset" class="button"><small>View project on</small>GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <h1>
+<a name="django-formset" class="anchor" href="#django-formset"><span class="octicon octicon-link"></span></a>Django Formset</h1>
+
+<p>Add new forms to Django form sets dynamically. Supports nested formsets and Bootstrap tabs.</p>
+
+<p><a href="https://travis-ci.org/mbertheau/jquery.django-formset"><img src="https://travis-ci.org/mbertheau/jquery.django-formset.png?branch=master" alt="Build Status"></a></p>
+
+<p>Download the <a href="https://raw.github.com/mbertheau/jquery.django-formset/master/dist/django-formset.min.js">production version</a> or the <a href="https://raw.github.com/mbertheau/jquery.django-formset/master/dist/django-formset.js">development version</a>.</p>
+
+<h2>
+<a name="examples" class="anchor" href="#examples"><span class="octicon octicon-link"></span></a>Examples</h2>
+
+<h3>
+<a name="a-simple-formset-as-a-list" class="anchor" href="#a-simple-formset-as-a-list"><span class="octicon octicon-link"></span></a>A simple formset as a list</h3>
+
+<div class="highlight highlight-html"><pre><span class="nt">&lt;ul</span> <span class="na">id=</span><span class="s">"formset"</span><span class="nt">&gt;</span>
+    {{ formset.management_form }}
+    {{ formset.non_form_errors }}
+    <span class="nt">&lt;li</span> <span class="na">class=</span><span class="s">"empty-form"</span><span class="nt">&gt;</span>
+        {{ formset.empty_form.as_p }}
+    <span class="nt">&lt;/li&gt;</span>
+    {% for form in formset %}
+        <span class="nt">&lt;li&gt;</span>
+            {{ form.as_p }}
+        <span class="nt">&lt;/li&gt;</span>
+    {% endfor %}
+<span class="nt">&lt;/ul&gt;</span>
+<span class="nt">&lt;button</span> <span class="na">type=</span><span class="s">"button"</span> <span class="na">class=</span><span class="s">"action-add-formset"</span><span class="nt">&gt;&lt;/button&gt;</span>
+
+<span class="nt">&lt;script </span><span class="na">type=</span><span class="s">"text/javascript"</span><span class="nt">&gt;</span>
+    <span class="nx">$</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nx">formset</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="s1">'#formset'</span><span class="p">).</span><span class="nx">children</span><span class="p">(</span><span class="s1">'li'</span><span class="p">).</span><span class="nx">djangoFormset</span><span class="p">();</span>
+        <span class="nx">$</span><span class="p">(</span><span class="s1">'#formset'</span><span class="p">).</span><span class="nx">on</span><span class="p">(</span><span class="s1">'click'</span><span class="p">,</span> <span class="s1">'.action-add-formset'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">formset</span><span class="p">.</span><span class="nx">addForm</span><span class="p">();</span>
+        <span class="p">});</span>
+    <span class="p">});</span>
+<span class="nt">&lt;/script&gt;</span>
+</pre></div>
+
+<p>You have to create an "add another form" <code>&lt;button&gt;</code> or <code>&lt;a&gt;</code> yourself somewhere and on click call
+the <code>addForm</code> method on the object returned by <code>djangoFormset()</code>.</p>
+
+<h3>
+<a name="how-it-works" class="anchor" href="#how-it-works"><span class="octicon octicon-link"></span></a>How it works</h3>
+
+<p>Pass a jQuery selection of the form elements in your formset. One of the form elements must be a
+form template, and it must have the CSS class passed as option <code>formTemplateClass</code> (<code>'empty-form'</code>
+by default). That class should be styled to be invisible. The correct form prefix is derived from
+the name of the first form element in the form template. For every form a Form object is created. If
+a form includes a delete checkbox it is replaced with a delete button. Dynamically added forms
+always have a delete button. The form object is also accessible via <code>.data('djangoFormset.Form')</code> on
+the any of the form elements.</p>
+
+<p>When a form is added the template is copied and its <code>empty-form</code> CSS class is removed. The new form
+is always added after the last existing form, or after the form template, if there are no existing
+forms. Inside the new form in the attributes of the following elements the correct form index is
+put in place of <code>__prefix__</code>:</p>
+
+<ul>
+<li>
+<code>id</code> and <code>name</code> attributes of <code>&lt;input&gt;</code>, <code>&lt;select&gt;</code> and <code>&lt;textarea&gt;</code>
+</li>
+<li>
+<code>for</code> attribute of <code>&lt;label&gt;</code>
+</li>
+<li>
+<code>id</code> attribute of the form's root element if that's a <code>&lt;div&gt;</code>
+</li>
+</ul><p>After adding the <code>formAdded</code> event is triggered to which you can attach a listener to do additional
+setup on the new form. The listener is passed the newly created form object. The <code>elem</code> member of
+the form object is the jquery object that contains the DOM node of the new form.</p>
+
+<p>When a form is deleted that was dynamically added before, it is removed from the DOM completely and
+the remaining forms are renumbered. If a form is deleted that existed on page load, it is just
+hidden and marked as deleted.</p>
+
+<p>Forms can be deleted from JavaScript by calling <code>delete()</code> on the form object or <code>deleteForm(index)</code>
+on the object returned by <code>djangoFormset</code>. <code>index</code> is the 0-based form number. Hidden forms count
+towards this index as well.</p>
+
+<p>If something doesn't work have a look at the JavaScript console. For a number of error conditions
+exceptions are raised.</p>
+
+<h3>
+<a name="a-bootstrap-tabbed-formset" class="anchor" href="#a-bootstrap-tabbed-formset"><span class="octicon octicon-link"></span></a>A Bootstrap-tabbed formset</h3>
+
+<div class="highlight highlight-html"><pre><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">"formset"</span><span class="nt">&gt;</span>
+    {{ formset.management_form }}
+    {{ formset.non_form_errors }}
+    <span class="nt">&lt;ul</span> <span class="na">class=</span><span class="s">"nav nav-tabs"</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;li</span> <span class="na">class=</span><span class="s">"empty-form"</span><span class="nt">&gt;</span>
+            <span class="nt">&lt;a</span> <span class="na">href=</span><span class="s">"#{{ formset.empty_form.prefix }}"</span> <span class="na">data-toggle=</span><span class="s">"tab"</span><span class="nt">&gt;</span>New tab<span class="nt">&lt;/a&gt;</span>
+        <span class="nt">&lt;/li&gt;</span>
+        {% for form in formset %}
+            <span class="nt">&lt;li</span> <span class="na">class=</span><span class="s">"{% if forloop.first %}active{% endif %}"</span><span class="nt">&gt;</span>
+                <span class="nt">&lt;a</span> <span class="na">href=</span><span class="s">"#{{ form.prefix }}"</span> <span class="na">data-toggle=</span><span class="s">"tab"</span><span class="nt">&gt;</span>
+                    {{ forloop.counter }}
+                <span class="nt">&lt;/a&gt;</span>
+            <span class="nt">&lt;/li&gt;</span>
+        {% endfor %}
+        <span class="nt">&lt;li&gt;</span>
+            <span class="nt">&lt;a</span> <span class="na">class=</span><span class="s">"btn action-add-formset"</span><span class="nt">&gt;</span>"Add another form<span class="nt">&lt;/a&gt;</span>
+        <span class="nt">&lt;/li&gt;</span>
+    <span class="nt">&lt;/ul&gt;</span>
+
+    <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"tab-content form-inline"</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"tab-pane empty-form"</span> <span class="na">id=</span><span class="s">"{{ formset.empty_form.prefix }}"</span><span class="nt">&gt;</span>
+            {{ formset.empty_form.as_p }}
+        <span class="nt">&lt;/div&gt;</span>
+        {% for form in formset %}
+            <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"tab-pane{% if forloop.first %} active{% endif %}"</span>
+                 <span class="na">id=</span><span class="s">"{{ form.prefix }}"</span><span class="nt">&gt;</span>
+                {% if form.instance.pk %}{{ form.DELETE }}{% endif %}
+                {{ form.as_p }}
+            <span class="nt">&lt;/div&gt;</span>
+        {% endfor %}
+    <span class="nt">&lt;/div&gt;</span>
+<span class="nt">&lt;/div&gt;</span>
+
+<span class="nt">&lt;script </span><span class="na">type=</span><span class="s">"text/javascript"</span><span class="nt">&gt;</span>
+    <span class="nx">$</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nx">formset</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="s1">'#formset'</span><span class="p">).</span><span class="nx">find</span><span class="p">(</span><span class="s1">'.tab-content &gt; .tab-pane'</span><span class="p">).</span><span class="nx">djangoFormset</span><span class="p">();</span>
+        <span class="nx">$</span><span class="p">(</span><span class="s1">'#formset'</span><span class="p">).</span><span class="nx">on</span><span class="p">(</span><span class="s1">'click'</span><span class="p">,</span> <span class="s1">'.action-add-formset'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="p">{</span>
+            <span class="cm">/* set tab handle text */</span>
+            <span class="nx">form</span><span class="p">.</span><span class="nx">tab</span><span class="p">.</span><span class="nx">elem</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s1">'a'</span><span class="p">).</span><span class="nx">text</span><span class="p">(</span><span class="nx">form</span><span class="p">.</span><span class="nx">index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">);</span>
+            <span class="nx">formset</span><span class="p">.</span><span class="nx">addForm</span><span class="p">();</span>
+        <span class="p">});</span>
+    <span class="p">});</span>
+<span class="nt">&lt;/script&gt;</span>
+</pre></div>
+
+<h3>
+<a name="how-it-works-1" class="anchor" href="#how-it-works-1"><span class="octicon octicon-link"></span></a>How it works</h3>
+
+<p>The tab functionality is triggered by the template form having the CSS class <code>tab-pane</code>.</p>
+
+<p>To find the tab navigation <code>djangoFormset</code> then looks for a child of a <code>.nav</code> that has an <code>&lt;a&gt;</code> or a
+<code>&lt;button&gt;</code> with a <code>href</code> or <code>data-target</code> that references the <code>id</code> of the form template root
+element.  In the example that <code>id</code> is the form prefix.</p>
+
+<p>When a new form is added a new tab is added after the last visible tab or after the template tab if
+there's no visible tab. Inside the tab the <code>href</code> and <code>data-target</code> attributes of <code>&lt;a&gt;</code> and
+<code>&lt;button&gt;</code> elements are updated to reflect the new form index.</p>
+
+<p>When a form is deleted the tab is hidden or removed depending on whether the form existed at page
+load time or not.</p>
+
+<h3>
+<a name="a-nested-bootstrap-tabbed-formset" class="anchor" href="#a-nested-bootstrap-tabbed-formset"><span class="octicon octicon-link"></span></a>A nested Bootstrap-tabbed formset</h3>
+
+<p>Use the python package <a href="https://pypi.python.org/pypi/django-nested-formset">django-nested-formset</a> for the Django side of things.</p>
+
+<p>In the view:</p>
+
+<div class="highlight highlight-python"><pre><span class="n">formset_class</span> <span class="o">=</span> <span class="n">nestedformset_factory</span><span class="p">(</span>
+    <span class="n">models</span><span class="o">.</span><span class="n">Block</span><span class="p">,</span>
+    <span class="n">models</span><span class="o">.</span><span class="n">Building</span><span class="p">,</span>
+    <span class="n">nested_formset</span><span class="o">=</span><span class="n">inlineformset_factory</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Building</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">Tenant</span><span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+
+<p>In the template:</p>
+
+<div class="highlight highlight-html"><pre>{{ outer_formset.management_form }}
+{{ outer_formset.non_form_errors }}
+<span class="nt">&lt;ul</span> <span class="na">class=</span><span class="s">"nav nav-tabs"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;li</span> <span class="na">class=</span><span class="s">"empty-form"</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;a</span> <span class="na">href=</span><span class="s">"#{{ outer_formset.empty_form.prefix }}"</span> <span class="na">data-toggle=</span><span class="s">"tab"</span><span class="nt">&gt;</span>New tab<span class="nt">&lt;/a&gt;</span>
+    <span class="nt">&lt;/li&gt;</span>
+    {% for outer_form in outer_formset %}
+        <span class="nt">&lt;li</span> <span class="na">class=</span><span class="s">"{% if forloop.first %}active{% endif %}"</span><span class="nt">&gt;</span>
+            <span class="nt">&lt;a</span> <span class="na">href=</span><span class="s">"#{{ outer_form.prefix }}"</span> <span class="na">data-toggle=</span><span class="s">"tab"</span><span class="nt">&gt;</span>Existing tab<span class="nt">&lt;/a&gt;</span>
+        <span class="nt">&lt;/li&gt;</span>
+    {% endfor %}
+    <span class="nt">&lt;li&gt;</span>
+        <span class="nt">&lt;a</span> <span class="na">class=</span><span class="s">"btn action-add-outer-form"</span><span class="nt">&gt;</span>{% trans "Add another outer form" %}<span class="nt">&lt;/a&gt;</span>
+    <span class="nt">&lt;/li&gt;</span>
+<span class="nt">&lt;/ul&gt;</span>
+
+<span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"tab-content"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"tab-pane empty-form"</span> <span class="na">id=</span><span class="s">"{{ outer_formset.empty_form.prefix }}"</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;div&gt;</span>
+            {{ outer_formset.empty_form.nested.management_form }}
+            <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"empty-form"</span><span class="nt">&gt;</span>
+                {{ outer_formset.empty_form.nested.empty_form.as_p }}
+            <span class="nt">&lt;/div&gt;</span>
+            {% for inner_form in outer_formset.empty_form.nested %}
+                <span class="nt">&lt;div&gt;</span>
+                    {{ inner_form.as_p }}
+                <span class="nt">&lt;/div&gt;</span>
+            {% endfor %}
+        <span class="nt">&lt;/div&gt;</span>
+        <span class="nt">&lt;div&gt;</span>
+            {{ outer_formset.empty_form.as_p }}
+        <span class="nt">&lt;/div&gt;</span>
+    <span class="nt">&lt;/div&gt;</span>
+    {% for outer_form in outer_formset %}
+        <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"tab-pane{% if forloop.first %} active{% endif %}"</span>
+             <span class="na">id=</span><span class="s">"{{ outer_form.prefix }}"</span><span class="nt">&gt;</span>
+            <span class="nt">&lt;div&gt;</span>
+                {{ outer_form.nested.management_form }}
+                {{ outer_form.nested.non_form_errors }}
+                <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"empty-form"</span><span class="nt">&gt;</span>
+                    {{ outer_form.nested.empty_form.as_p }}
+                <span class="nt">&lt;/div&gt;</span>
+                {% for inner_form in outer_form.nested %}
+                    <span class="nt">&lt;div&gt;</span>
+                        {{ inner_form.as_p }}
+                    <span class="nt">&lt;/div&gt;</span>
+                {% endfor %}
+                <span class="nt">&lt;button</span> <span class="na">type=</span><span class="s">"button"</span> <span class="na">class=</span><span class="s">"btn btn-primary action-add-inner-form"</span><span class="nt">&gt;</span>
+                    Add another inner form
+                <span class="nt">&lt;/button&gt;</span>
+            <span class="nt">&lt;/div&gt;</span>
+            <span class="nt">&lt;div&gt;</span>
+                {{ outer_form.as_p }}
+            <span class="nt">&lt;/div&gt;</span>
+        <span class="nt">&lt;/div&gt;</span>
+    {% endfor %}
+    <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"actions"</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;button</span> <span class="na">type=</span><span class="s">"button"</span> <span class="na">class=</span><span class="s">"btn btn-primary action-add-outer-form"</span><span class="nt">&gt;</span>
+            Add another outer form
+        <span class="nt">&lt;/button&gt;</span>
+    <span class="nt">&lt;/div&gt;</span>
+<span class="nt">&lt;/div&gt;</span>
+
+<span class="nt">&lt;script </span><span class="na">type=</span><span class="s">"text/javascript"</span><span class="nt">&gt;</span>
+    <span class="kd">var</span> <span class="nx">outerFormset</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="s2">"div.tab-content &gt; div.tab-pane"</span><span class="p">).</span><span class="nx">not</span><span class="p">(</span><span class="s1">'.actions'</span><span class="p">)</span>
+        <span class="p">.</span><span class="nx">djangoFormset</span><span class="p">({</span>
+        <span class="nx">on</span><span class="o">:</span> <span class="p">{</span>
+            <span class="nx">formInitialized</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">event</span><span class="p">,</span> <span class="nx">form</span><span class="p">)</span> <span class="p">{</span>
+                <span class="cm">/* Init inner formset */</span>
+                <span class="kd">var</span> <span class="nx">innerFormsetElem</span> <span class="o">=</span> <span class="nx">form</span><span class="p">.</span><span class="nx">elem</span><span class="p">.</span><span class="nx">children</span><span class="p">(</span><span class="s1">'div'</span><span class="p">).</span><span class="nx">first</span><span class="p">();</span>
+                <span class="kd">var</span> <span class="nx">innerFormset</span> <span class="o">=</span> <span class="nx">innerFormsetElem</span><span class="p">.</span><span class="nx">children</span><span class="p">(</span><span class="s1">'div'</span><span class="p">).</span><span class="nx">djangoFormset</span><span class="p">();</span>
+                <span class="nx">innerFormsetElem</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">'click'</span><span class="p">,</span> <span class="s1">'.action-add-inner-form'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="nx">innerFormset</span><span class="p">.</span><span class="nx">addForm</span><span class="p">();</span>
+                <span class="p">});</span>
+            <span class="p">},</span>
+            <span class="nx">formAdded</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">event</span><span class="p">,</span> <span class="nx">form</span><span class="p">)</span> <span class="p">{</span>
+                <span class="cm">/* Optionally set tab header text on new forms */</span>
+                <span class="nx">form</span><span class="p">.</span><span class="nx">tab</span><span class="p">.</span><span class="nx">elem</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s1">'a'</span><span class="p">).</span><span class="nx">text</span><span class="p">(</span><span class="s2">"Form number "</span> <span class="o">+</span> <span class="p">(</span><span class="nx">form</span><span class="p">.</span><span class="nx">index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">));</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">});</span>
+    <span class="cm">/* Add new outer form on add button click */</span>
+    <span class="nx">$</span><span class="p">().</span><span class="nx">on</span><span class="p">(</span><span class="s1">'click'</span><span class="p">,</span> <span class="s1">'.action-add-outer-form'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">outerFormset</span><span class="p">.</span><span class="nx">addForm</span><span class="p">();</span>
+    <span class="p">});</span>
+    <span class="cm">/* Optionally update tab label based on input value */</span>
+    <span class="nx">$</span><span class="p">().</span><span class="nx">on</span><span class="p">(</span><span class="s1">'change'</span><span class="p">,</span> <span class="s1">'input:not([name*="__prefix__"]):first'</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">tabLabel</span> <span class="o">=</span> <span class="s2">"First input value is "</span> <span class="o">+</span> <span class="nx">$</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">val</span><span class="p">();</span>
+        <span class="nx">form</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">closest</span><span class="p">(</span><span class="s1">'.tab-pane'</span><span class="p">).</span><span class="nx">data</span><span class="p">(</span><span class="s1">'djangoFormset.Form'</span><span class="p">);</span>
+        <span class="nx">form</span><span class="p">.</span><span class="nx">tab</span><span class="p">.</span><span class="nx">elem</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s1">'a'</span><span class="p">).</span><span class="nx">text</span><span class="p">(</span><span class="nx">tabLabel</span><span class="p">);</span>
+    <span class="p">});</span>
+<span class="nt">&lt;/script&gt;</span>
+</pre></div>
+
+<h3>
+<a name="how-it-works-2" class="anchor" href="#how-it-works-2"><span class="octicon octicon-link"></span></a>How it works</h3>
+
+<p>The plugin takes care to replace just the first occurrence of the template marker <code>__prefix__</code>. It
+also is careful not to leave the boundaries of the current form instance when it applies the needed
+modifications to the DOM. Lastly it provides events to hook up the initialization of the inner
+formset.</p>
+
+<p>I haven't tried it, but more than one nesting level should work just as fine.</p>
+
+<h2>
+<a name="release-history" class="anchor" href="#release-history"><span class="octicon octicon-link"></span></a>Release History</h2>
+
+<p>I'll leave this unreleased for a while until the plugin had some exposure to make sure it doesn't
+have any nasty bugs. (2014-03-07)</p>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/mbertheau/jquery.django-formset/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/mbertheau/jquery.django-formset/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/mbertheau/jquery.django-formset"></a> is maintained by <a href="https://github.com/mbertheau">mbertheau</a>.</p>
+
+          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
+    </div>
+
+  
+  </body>
+</html>
