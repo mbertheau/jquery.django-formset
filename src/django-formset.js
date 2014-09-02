@@ -163,7 +163,7 @@ var __hasProp = {}.hasOwnProperty,
     }
 
     Form.prototype.getDeleteButton = function() {
-      return $('<button type="button" class="btn btn-danger"> Delete </button>');
+      return $("<button type='button' class='btn btn-danger'> " + this.formset.opts.deleteButtonText + " </button>");
     };
 
     Form.prototype.insertDeleteButton = function() {
@@ -306,7 +306,8 @@ var __hasProp = {}.hasOwnProperty,
   $.fn.djangoFormset.defaultOptions = {
     formTemplateClass: 'empty-form',
     formClass: $.fn.djangoFormset.Form,
-    tabClass: $.fn.djangoFormset.Tab
+    tabClass: $.fn.djangoFormset.Tab,
+    deleteButtonText: 'Delete'
   };
   $.djangoFormset = {
     getTabActivator: function(id) {

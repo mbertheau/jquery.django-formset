@@ -153,9 +153,9 @@
         @_replaceDeleteCheckboxWithButton()
 
     getDeleteButton: ->
-      $('<button type="button" class="btn btn-danger">
-           Delete
-         </button>')
+      $("<button type='button' class='btn btn-danger'>
+           #{@formset.opts.deleteButtonText}
+         </button>")
 
     insertDeleteButton: ->
       if @deleteInput.length > 0
@@ -284,6 +284,7 @@
     formTemplateClass: 'empty-form'
     formClass: $.fn.djangoFormset.Form
     tabClass: $.fn.djangoFormset.Tab
+    deleteButtonText: 'Delete'
 
   $.djangoFormset =
     getTabActivator: (id) ->
