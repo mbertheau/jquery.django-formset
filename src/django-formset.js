@@ -145,7 +145,7 @@ var __hasProp = {}.hasOwnProperty,
   })();
   $.fn.djangoFormset.Form = (function() {
     function Form(elem, formset, index, tab) {
-      var deleteName, isInitial;
+      var isInitial;
       this.elem = elem;
       this.formset = formset;
       this.index = index;
@@ -154,8 +154,7 @@ var __hasProp = {}.hasOwnProperty,
       if (this.index !== void 0) {
         this._initFormIndex(this.index);
       }
-      deleteName = "" + this.formset.prefix + "-" + this.index + "-DELETE";
-      this.deleteInput = this.elem.find("input[name='" + deleteName + "']");
+      this.deleteInput = this.field('DELETE');
       isInitial = this.index < this.formset.initialForms;
       if (this.deleteInput.length > 0 || !isInitial) {
         this._replaceDeleteCheckboxWithButton();
@@ -212,6 +211,10 @@ var __hasProp = {}.hasOwnProperty,
 
     Form.prototype.hide = function() {
       return this.elem.hide();
+    };
+
+    Form.prototype.field = function(name) {
+      return this.elem.find("[name='" + this.formset.prefix + "-" + this.index + "-" + name + "']");
     };
 
     Form.prototype._replaceDeleteCheckboxWithButton = function() {

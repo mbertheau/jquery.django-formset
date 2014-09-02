@@ -146,8 +146,7 @@
       @elem.data('djangoFormset.Form', this)
       if @index isnt undefined
         @_initFormIndex(@index)
-      deleteName = "#{@formset.prefix}-#{@index}-DELETE"
-      @deleteInput = @elem.find("input[name='#{deleteName}']")
+      @deleteInput = @field('DELETE')
       isInitial = @index < @formset.initialForms
       if @deleteInput.length > 0 or not isInitial
         @_replaceDeleteCheckboxWithButton()
@@ -201,6 +200,9 @@
 
     hide: ->
       @elem.hide()
+
+    field: (name) ->
+      return @elem.find("[name='#{@formset.prefix}-#{@index}-#{name}']")
 
     _replaceDeleteCheckboxWithButton: ->
       if @deleteInput.length > 0
