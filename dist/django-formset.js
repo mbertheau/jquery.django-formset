@@ -220,6 +220,17 @@ var __hasProp = {}.hasOwnProperty,
       return this.elem.find("[name='" + this.formset.prefix + "-" + this.index + "-" + name + "']");
     };
 
+    Form.prototype.prev = function() {
+      var form, _i, _ref;
+      _ref = this.formset.forms.slice(0, +(this.index - 1) + 1 || 9e9);
+      for (_i = _ref.length - 1; _i >= 0; _i += -1) {
+        form = _ref[_i];
+        if (form.elem.is(':visible')) {
+          return form;
+        }
+      }
+    };
+
     Form.prototype._replaceDeleteCheckboxWithButton = function() {
       var newDeleteInput;
       if (this.deleteInput.length > 0) {

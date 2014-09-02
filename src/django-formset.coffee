@@ -204,6 +204,11 @@
     field: (name) ->
       return @elem.find("[name='#{@formset.prefix}-#{@index}-#{name}']")
 
+    prev: ->
+      for form in @formset.forms[..@index - 1] by -1
+        if form.elem.is(':visible')
+          return form
+
     _replaceDeleteCheckboxWithButton: ->
       if @deleteInput.length > 0
         newDeleteInput = $("<input type='hidden'
