@@ -261,5 +261,12 @@ I haven't tried it, but more than one nesting level should work just as fine.
 
 ## Release History
 
-I'll leave this unreleased for a while until the plugin had some exposure to make sure it doesn't
-have any nasty bugs. (2014-03-07)
+### 0.2.0 (2014-09-02)
+
+* Add option `deleteButtonText` to change the text from the default "Delete"
+* Add method `Form.field(name)` to get a form field by its non-prefixed name
+* Add method `Form.prev()` to get the previous non-deleted form
+
+### 0.1.0 (2014-03-08)
+
+Initial Release
