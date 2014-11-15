@@ -11,6 +11,7 @@ var __hasProp = {}.hasOwnProperty,
     this.fixtureNoTotalForms = allFixtures.find('#no-total-forms');
     this.fixtureSimpleList = allFixtures.find('#simple-list');
     this.fixtureSimpleFormAsList = allFixtures.find('#simple-form-as-list');
+    this.fixtureSimpleFormAsListDeleteInputInsideLabel = allFixtures.find('#simple-form-as-list-delete-input-inside-label');
     this.fixtureSimpleTable = allFixtures.find('#simple-table');
     this.fixtureDivWithForm = allFixtures.find('#div-with-form');
     this.fixtureDivWithFormOneInitial = allFixtures.find('#div-with-form-one-initial');
@@ -375,6 +376,13 @@ var __hasProp = {}.hasOwnProperty,
       form = _ref[index];
       equal(form.myProp, "foo", "Form #" + index + " has the custom property set");
     }
+  });
+  test("adds delete button and input even if original delete input is inside its own label (issue #4)", function() {
+    var fixture, formset;
+    fixture = this.fixtureSimpleFormAsListDeleteInputInsideLabel;
+    formset = fixture.children('ul').djangoFormset();
+    equal(fixture.find("button:contains('Delete')").length, 1, "Delete button is there");
+    equal(formset.forms[0].field('DELETE').length, 1, "Delete input is there");
   });
 })(jQuery);
 

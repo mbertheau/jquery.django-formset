@@ -29,6 +29,8 @@
     @fixtureNoTotalForms = allFixtures.find('#no-total-forms')
     @fixtureSimpleList = allFixtures.find('#simple-list')
     @fixtureSimpleFormAsList = allFixtures.find('#simple-form-as-list')
+    @fixtureSimpleFormAsListDeleteInputInsideLabel = allFixtures.find(
+      '#simple-form-as-list-delete-input-inside-label')
     @fixtureSimpleTable = allFixtures.find('#simple-table')
     @fixtureDivWithForm = allFixtures.find('#div-with-form')
     @fixtureDivWithFormOneInitial = allFixtures.find(
@@ -161,7 +163,7 @@
 
     formset = @fixtureDivWithForm.children('div').djangoFormset()
     equal(parseInt(@fixtureDivWithForm
-                   .find('input[name="div-with-form-TOTAL_FORMS"]').val()), 0,
+      .find('input[name="div-with-form-TOTAL_FORMS"]').val()), 0,
       "initially TOTAL_FORMS is 0")
 
     formset.addForm()
@@ -590,6 +592,17 @@
     return
   )
 
+  test("adds delete button and input even if original delete input is inside
+    its own label (issue #4)", ->
+    fixture = @fixtureSimpleFormAsListDeleteInputInsideLabel
+    formset = fixture.children('ul').djangoFormset()
+
+    equal(fixture.find("button:contains('Delete')").length, 1,
+    "Delete button is there")
+    equal(formset.forms[0].field('DELETE').length, 1, "Delete input is there")
+
+    return
+  )
 
   return
 )(jQuery)

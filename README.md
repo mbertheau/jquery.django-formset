@@ -261,6 +261,10 @@ I haven't tried it, but more than one nesting level should work just as fine.
 
 ## Release History
 
+### 0.3.0 (unreleased)
+
+* Handle the delete input being inside its own label (#4)
+
 ### 0.2.0 (2014-09-02)
 
 * Add option `deleteButtonText` to change the text from the default "Delete"

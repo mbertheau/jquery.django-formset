@@ -229,11 +229,16 @@ var __hasProp = {}.hasOwnProperty,
     };
 
     Form.prototype._replaceDeleteCheckboxWithButton = function() {
-      var newDeleteInput;
+      var label, newDeleteInput;
       if (this.deleteInput.length > 0) {
         newDeleteInput = $("<input type='hidden' name='" + (this.deleteInput.attr('name')) + "' id='" + (this.deleteInput.attr('id')) + "' value='" + (this.deleteInput.is(':checked') ? 'on' : '') + "'/>");
-        this.elem.find("label[for='" + (this.deleteInput.attr('id')) + "']").remove();
-        this.deleteInput.replaceWith(newDeleteInput);
+        label = this.elem.find("label[for='" + (this.deleteInput.attr('id')) + "']");
+        if (label.has(this.deleteInput).length > 0) {
+          label.replaceWith(newDeleteInput);
+        } else {
+          label.remove();
+          this.deleteInput.replaceWith(newDeleteInput);
+        }
         this.deleteInput = newDeleteInput;
       }
       this.deleteButton = this.getDeleteButton();

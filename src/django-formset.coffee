@@ -217,8 +217,12 @@
           value='#{if @deleteInput.is(':checked') then 'on' else ''}'/>")
 
         # Remove any label for the delete checkbox
-        @elem.find("label[for='#{@deleteInput.attr('id')}']").remove()
-        @deleteInput.replaceWith(newDeleteInput)
+        label = @elem.find("label[for='#{@deleteInput.attr('id')}']")
+        if label.has(@deleteInput).length > 0
+          label.replaceWith(newDeleteInput)
+        else
+          label.remove()
+          @deleteInput.replaceWith(newDeleteInput)
         @deleteInput = newDeleteInput
 
       @deleteButton = @getDeleteButton()
