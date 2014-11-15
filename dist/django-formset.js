@@ -1,4 +1,4 @@
-/*! Django Formset - v0.2.0 - 2014-11-15
+/*! Django Formset - v0.3.0 - 2014-11-15
 * https://github.com/mbertheau/jquery.django-formset
 * Copyright (c) 2014 Markus Bertheau; Licensed MIT */
 var __hasProp = {}.hasOwnProperty,
