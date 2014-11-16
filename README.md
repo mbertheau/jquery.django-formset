@@ -11,35 +11,56 @@ Download the [production version][min] or the [development version][max].
 
 ## Examples
 
-### A simple formset as a list
+### A simple formset
 
 ```html
-<ul id="formset">
+<form action="" method="post">
+    {% csrf_token %}
     {{ formset.management_form }}
-    {{ formset.non_form_errors }}
-    <li class="empty-form">
-        {{ formset.empty_form.as_p }}
-    </li>
+
+    <div class="row empty-form">
+        <div class="column">
+            <h3>A building</h3>
+            {{ formset.empty_form.as_p }}
+        </div>
+    </div>
+
     {% for form in formset %}
-        <li>
-            {{ form.as_p }}
-        </li>
+        <div class="row">
+            <div class="column">
+                <h3>A building</h3>
+                {{ form.as_p }}
+            </div>
+
+        </div>
     {% endfor %}
-</ul>
-<button type="button" class="action-add-formset"></button>
+
+    <input type="submit" value="Save" />
+</form>
 
 <script type="text/javascript">
     $(function() {
-        formset = $('#formset').children('li').djangoFormset();
-        $('#formset').on('click', '.action-add-formset', function(event) {
-            formset.addForm();
-        });
-    });
+        var formset = $('form').children('div').djangoFormset();
+     });
 </script>
 ```
 
-You have to create an "add another form" `<button>` or `<a>` yourself somewhere and on click call
-the `addForm` method on the object returned by `djangoFormset()`.
+The plugin doesn't automatically add an "add another form" `<button>` or `<a>` element. You have to
+do that yourself somewhere and on click call the `addForm` method on the object returned by
+`djangoFormset()`:
+
+```html
+<button type="button" data-action="add-formset">Add formset</button>
+
+<script type="text/javascript">
+    $(function() {
+        var formset = $('form').children('div').djangoFormset();
+        $('form').on('click', '[data-action=add-formset]', function(event) {
+            formset.addForm();
+        });
+     });
+</script>
+```
 
 ### How it works
 
@@ -75,51 +96,55 @@ towards this index as well.
 If something doesn't work have a look at the JavaScript console. For a number of error conditions
 exceptions are raised.
 
-### A Bootstrap-tabbed formset
+### A Bootstrap2-tabbed formset
 
 ```html
-<div id="formset">
+<form action="" method="post">
+    {% csrf_token %}
     {{ formset.management_form }}
-    {{ formset.non_form_errors }}
+
     <ul class="nav nav-tabs">
         <li class="empty-form">
             <a href="#{{ formset.empty_form.prefix }}" data-toggle="tab">New tab</a>
         </li>
         {% for form in formset %}
-            <li class="{% if forloop.first %}active{% endif %}">
-                <a href="#{{ form.prefix }}" data-toggle="tab">
-                    {{ forloop.counter }}
-                </a>
+            <li{% if forloop.first %} class="active"{% endif %}>
+                <a href="#{{ form.prefix }}" data-toggle="tab">Tab #{{ forloop.counter }}</a>
             </li>
         {% endfor %}
-        <li>
-            <a class="btn action-add-formset">"Add another form</a>
-        </li>
     </ul>
 
     <div class="tab-content form-inline">
         <div class="tab-pane empty-form" id="{{ formset.empty_form.prefix }}">
             {{ formset.empty_form.as_p }}
         </div>
+
         {% for form in formset %}
             <div class="tab-pane{% if forloop.first %} active{% endif %}"
                  id="{{ form.prefix }}">
-                {% if form.instance.pk %}{{ form.DELETE }}{% endif %}
                 {{ form.as_p }}
             </div>
         {% endfor %}
     </div>
-</div>
+
+    <button type="button" class="btn btn-primary" data-action="add-form">Add form</button>
+
+    <input type="submit" value="Save" />
+</form>
 
 <script type="text/javascript">
     $(function() {
-        formset = $('#formset').find('.tab-content > .tab-pane').djangoFormset();
-        $('#formset').on('click', '.action-add-formset', function(event) {
-            /* set tab handle text */
-            form.tab.elem.find('a').text(form.index + 1);
+        var formset = $('form > div.tab-content').children('.tab-pane').djangoFormset({
+            on: {
+                formAdded: function(event, form) {
+                    form.tab.elem.find('a').text("Tab #" + (form.index + 1));
+                }
+            }
+        });
+        $('form').on('click', '[data-action=add-form]', function(event) {
             formset.addForm();
         });
-    });
+     });
 </script>
 ```
 
@@ -138,7 +163,7 @@ there's no visible tab. Inside the tab the `href` and `data-target` attributes o
 When a form is deleted the tab is hidden or removed depending on whether the form existed at page
 load time or not.
 
-### A nested Bootstrap-tabbed formset
+### A nested Bootstrap2-tabbed formset
 
 Use the python package [django-nested-formset] for the Django side of things.
 
@@ -156,68 +181,72 @@ formset_class = nestedformset_factory(
 
 In the template:
 ```html
-{{ outer_formset.management_form }}
-{{ outer_formset.non_form_errors }}
-<ul class="nav nav-tabs">
-    <li class="empty-form">
-        <a href="#{{ outer_formset.empty_form.prefix }}" data-toggle="tab">New tab</a>
-    </li>
-    {% for outer_form in outer_formset %}
-        <li class="{% if forloop.first %}active{% endif %}">
-            <a href="#{{ outer_form.prefix }}" data-toggle="tab">Existing tab</a>
+<form action="" method="post">
+    {% csrf_token %}
+    {{ outer_formset.management_form }}
+    {{ outer_formset.non_form_errors }}
+    <ul class="nav nav-tabs">
+        <li class="empty-form">
+            <a href="#{{ outer_formset.empty_form.prefix }}" data-toggle="tab">New tab</a>
         </li>
-    {% endfor %}
-    <li>
-        <a class="btn action-add-outer-form">{% trans "Add another outer form" %}</a>
-    </li>
-</ul>
+        {% for outer_form in outer_formset %}
+            <li class="{% if forloop.first %}active{% endif %}">
+            <a href="#{{ outer_form.prefix }}" data-toggle="tab">Tab #{{ forloop.counter }}</a>
+            </li>
+        {% endfor %}
+    </ul>
 
-<div class="tab-content">
-    <div class="tab-pane empty-form" id="{{ outer_formset.empty_form.prefix }}">
-        <div>
-            {{ outer_formset.empty_form.nested.management_form }}
-            <div class="empty-form">
-                {{ outer_formset.empty_form.nested.empty_form.as_p }}
-            </div>
-            {% for inner_form in outer_formset.empty_form.nested %}
-                <div>
-                    {{ inner_form.as_p }}
-                </div>
-            {% endfor %}
-        </div>
-        <div>
-            {{ outer_formset.empty_form.as_p }}
-        </div>
-    </div>
-    {% for outer_form in outer_formset %}
-        <div class="tab-pane{% if forloop.first %} active{% endif %}"
-             id="{{ outer_form.prefix }}">
+    <div class="tab-content form-inline">
+        <div class="tab-pane empty-form" id="{{ outer_formset.empty_form.prefix }}">
             <div>
-                {{ outer_form.nested.management_form }}
-                {{ outer_form.nested.non_form_errors }}
+                {{ outer_formset.empty_form.nested.management_form }}
                 <div class="empty-form">
-                    {{ outer_form.nested.empty_form.as_p }}
+                    {{ outer_formset.empty_form.nested.empty_form.as_p }}
                 </div>
-                {% for inner_form in outer_form.nested %}
+                {% for inner_form in outer_formset.empty_form.nested %}
                     <div>
                         {{ inner_form.as_p }}
                     </div>
                 {% endfor %}
-                <button type="button" class="btn btn-primary action-add-inner-form">
-                    Add another inner form
+                <button type="button" class="btn btn-primary" data-action="add-inner-form">
+                    Add inner form
                 </button>
             </div>
             <div>
-                {{ outer_form.as_p }}
+                {{ outer_formset.empty_form.as_p }}
             </div>
         </div>
-    {% endfor %}
-    <div class="actions">
-        <button type="button" class="btn btn-primary action-add-outer-form">
-            Add another outer form
-        </button>
+        {% for outer_form in outer_formset %}
+            <div class="tab-pane{% if forloop.first %} active{% endif %}"
+                 id="{{ outer_form.prefix }}">
+                <div>
+                    {{ outer_form.nested.management_form }}
+                    {{ outer_form.nested.non_form_errors }}
+                    <div class="empty-form">
+                        {{ outer_form.nested.empty_form.as_p }}
+                    </div>
+                    {% for inner_form in outer_form.nested %}
+                        <div>
+                            {{ inner_form.as_p }}
+                        </div>
+                    {% endfor %}
+                    <button type="button" class="btn btn-primary" data-action="add-inner-form">
+                        Add inner form
+                    </button>
+                </div>
+                <div>
+                    {{ outer_form.as_p }}
+                </div>
+            </div>
+        {% endfor %}
+        <div class="actions">
+            <button type="button" class="btn btn-primary" data-action="add-outer-form">
+                Add outer form
+            </button>
+            <input type="submit" value="Save" />
+        </div>
     </div>
-</div>
+</form>
 
 <script type="text/javascript">
     var outerFormset = $("div.tab-content > div.tab-pane").not('.actions')
@@ -227,22 +256,22 @@ In the template:
                 /* Init inner formset */
                 var innerFormsetElem = form.elem.children('div').first();
                 var innerFormset = innerFormsetElem.children('div').djangoFormset();
-                innerFormsetElem.on('click', '.action-add-inner-form', function(event) {
+                innerFormsetElem.on('click', '[data-action=add-inner-form]', function(event) {
                     innerFormset.addForm();
                 });
             },
             formAdded: function(event, form) {
                 /* Optionally set tab header text on new forms */
-                form.tab.elem.find('a').text("Form number " + (form.index + 1));
+                form.tab.elem.find('a').text("Tab #" + (form.index + 1));
             }
         }
     });
     /* Add new outer form on add button click */
-    $().on('click', '.action-add-outer-form', function(event) {
+    $('form').on('click', '[data-action=add-outer-form]', function(event) {
         outerFormset.addForm();
     });
     /* Optionally update tab label based on input value */
-    $().on('change', 'input:not([name*="__prefix__"]):first', function() {
+    $('form').on('change', 'input:not([name*="__prefix__"]):first', function() {
         var tabLabel = "First input value is " + $(this).val();
         form = $(this).closest('.tab-pane').data('djangoFormset.Form');
         form.tab.elem.find('a').text(tabLabel);
