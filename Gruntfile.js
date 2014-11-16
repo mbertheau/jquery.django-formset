@@ -92,7 +92,8 @@ module.exports = function(grunt) {
       test: {
         files: {
           'test/django-formset_test.js': 'test/django-formset_test.coffee',
-          'test/django-formset_test-bootstrap.js': 'test/django-formset_test-bootstrap.coffee'
+          'test/django-formset_test-bootstrap.js': 'test/django-formset_test-bootstrap.coffee',
+          'test/django-formset_test-foundation.js': 'test/django-formset_test-foundation.coffee'
         },
       },
     },

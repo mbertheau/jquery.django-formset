@@ -53,7 +53,10 @@
       @forms = forms.map((index, element) =>
         if @hasTabs
           tabActivator = $.djangoFormset.getTabActivator(element.id)
-          tab = new @opts.tabClass(tabActivator.closest('.nav > *'))
+          if @hasBootstrapTabs
+            tab = new @opts.tabClass(tabActivator.closest('.nav > *'))
+          else
+            tab = new @opts.tabClass(tabActivator.closest('[data-tab] > *'))
         newForm = new @opts.formClass($(element), this, index, tab)
         $(this).trigger("formInitialized", [newForm])
         newForm
@@ -73,7 +76,12 @@
       return
 
     _initTabs: ->
-      @hasTabs = @template.is('.tab-pane')
+      @hasBootstrapTabs = (@template.is('.tab-pane') &&
+                           @template.parent().is('.tab-content'))
+      @hasFoundationTabs = (@template.is('.content') &&
+                            @template.parent().is('.tabs-content'))
+      @hasTabs = @hasBootstrapTabs || @hasFoundationTabs
+
       if not @hasTabs
         return
 
@@ -82,10 +90,13 @@
         throw new FormsetError("Template is .tab-pane but couldn't find
                                 corresponding tab activator.")
 
-      tabNav = tabActivator.closest('.nav')
+      if @hasBootstrapTabs
+        tabNav = tabActivator.closest('.nav')
+      else
+        tabNav = tabActivator.closest('[data-tab]')
       if tabNav.length == 0
-        throw new FormsetError("Template is .tab-pane but couldn't find
-                                corresponding .nav.")
+        throw new FormsetError("Couldn't find template tab for template tab
+                                pane.")
 
       @tabTemplate = tabNav.children(".#{@opts.formTemplateClass}")
       if @tabTemplate.length == 0
@@ -283,10 +294,13 @@
 
   class $.fn.djangoFormset.Tab
     constructor: (@elem) ->
+      if @elem.length == 0
+        throw new FormsetError("Tab element not found.")
+
       @elem.data('djangoFormset.tab', this)
 
     activate: ->
-      @elem.find("[data-toggle='tab']").trigger('click')
+      @elem.find("a").trigger('click')
 
     remove: ->
       @elem.remove()

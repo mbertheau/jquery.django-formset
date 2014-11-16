@@ -1,4 +1,4 @@
-/*! Django Formset - v0.3.0 - 2014-11-15
+/*! Django Formset - v0.3.0 - 2014-11-16
 * https://github.com/mbertheau/jquery.django-formset
 * Copyright (c) 2014 Markus Bertheau; Licensed MIT */
 var __hasProp = {}.hasOwnProperty,
@@ -52,7 +52,11 @@ var __hasProp = {}.hasOwnProperty,
           var newForm, tab, tabActivator;
           if (_this.hasTabs) {
             tabActivator = $.djangoFormset.getTabActivator(element.id);
-            tab = new _this.opts.tabClass(tabActivator.closest('.nav > *'));
+            if (_this.hasBootstrapTabs) {
+              tab = new _this.opts.tabClass(tabActivator.closest('.nav > *'));
+            } else {
+              tab = new _this.opts.tabClass(tabActivator.closest('[data-tab] > *'));
+            }
           }
           newForm = new _this.opts.formClass($(element), _this, index, tab);
           $(_this).trigger("formInitialized", [newForm]);
@@ -77,7 +81,9 @@ var __hasProp = {}.hasOwnProperty,
 
     Formset.prototype._initTabs = function() {
       var tabActivator, tabNav;
-      this.hasTabs = this.template.is('.tab-pane');
+      this.hasBootstrapTabs = this.template.is('.tab-pane') && this.template.parent().is('.tab-content');
+      this.hasFoundationTabs = this.template.is('.content') && this.template.parent().is('.tabs-content');
+      this.hasTabs = this.hasBootstrapTabs || this.hasFoundationTabs;
       if (!this.hasTabs) {
         return;
       }
@@ -85,9 +91,13 @@ var __hasProp = {}.hasOwnProperty,
       if (tabActivator.length === 0) {
         throw new FormsetError("Template is .tab-pane but couldn't find corresponding tab activator.");
       }
-      tabNav = tabActivator.closest('.nav');
+      if (this.hasBootstrapTabs) {
+        tabNav = tabActivator.closest('.nav');
+      } else {
+        tabNav = tabActivator.closest('[data-tab]');
+      }
       if (tabNav.length === 0) {
-        throw new FormsetError("Template is .tab-pane but couldn't find corresponding .nav.");
+        throw new FormsetError("Couldn't find template tab for template tab pane.");
       }
       this.tabTemplate = tabNav.children("." + this.opts.formTemplateClass);
       if (this.tabTemplate.length === 0) {
@@ -311,11 +321,14 @@ var __hasProp = {}.hasOwnProperty,
   $.fn.djangoFormset.Tab = (function() {
     function Tab(elem) {
       this.elem = elem;
+      if (this.elem.length === 0) {
+        throw new FormsetError("Tab element not found.");
+      }
       this.elem.data('djangoFormset.tab', this);
     }
 
     Tab.prototype.activate = function() {
-      return this.elem.find("[data-toggle='tab']").trigger('click');
+      return this.elem.find("a").trigger('click');
     };
 
     Tab.prototype.remove = function() {
