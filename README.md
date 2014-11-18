@@ -13,56 +13,12 @@ Download the [production version][min] or the [development version][max].
 
 ### A simple formset
 
-```html
-<form action="" method="post">
-    {% csrf_token %}
-    {{ formset.management_form }}
+[Code][Dynamic]
 
-    <div class="row empty-form">
-        <div class="column">
-            <h3>A building</h3>
-            {{ formset.empty_form.as_p }}
-        </div>
-    </div>
+[Dynamic]: https://github.com/mbertheau/jquery.django-formset-example/blob/master/blocks/templates/blocks/building_form_dynamic.html
 
-    {% for form in formset %}
-        <div class="row">
-            <div class="column">
-                <h3>A building</h3>
-                {{ form.as_p }}
-            </div>
-
-        </div>
-    {% endfor %}
-
-    <input type="submit" value="Save" />
-</form>
-
-<script type="text/javascript">
-    $(function() {
-        var formset = $('form').children('div').djangoFormset();
-     });
-</script>
-```
-
-The plugin doesn't automatically add an "add another form" `<button>` or `<a>` element. You have to
-do that yourself somewhere and on click call the `addForm` method on the object returned by
-`djangoFormset()`:
-
-```html
-<button type="button" data-action="add-formset">Add formset</button>
-
-<script type="text/javascript">
-    $(function() {
-        var formset = $('form').children('div').djangoFormset();
-        $('form').on('click', '[data-action=add-formset]', function(event) {
-            formset.addForm();
-        });
-     });
-</script>
-```
-
-### How it works
+The plugin doesn't automatically add an "add another form" button. You have to do that yourself
+somewhere and hook it up to call the `addForm` method on the object returned by `djangoFormset()`.
 
 Pass a jQuery selection of the form elements in your formset. One of the form elements must be a
 form template, and it must have the CSS class passed as option `formTemplateClass` (`'empty-form'`
@@ -98,57 +54,9 @@ exceptions are raised.
 
 ### A Bootstrap2-tabbed formset
 
-```html
-<form action="" method="post">
-    {% csrf_token %}
-    {{ formset.management_form }}
+[Code][Dynamic with tabs]
 
-    <ul class="nav nav-tabs">
-        <li class="empty-form">
-            <a href="#{{ formset.empty_form.prefix }}" data-toggle="tab">New tab</a>
-        </li>
-        {% for form in formset %}
-            <li{% if forloop.first %} class="active"{% endif %}>
-                <a href="#{{ form.prefix }}" data-toggle="tab">Tab #{{ forloop.counter }}</a>
-            </li>
-        {% endfor %}
-    </ul>
-
-    <div class="tab-content form-inline">
-        <div class="tab-pane empty-form" id="{{ formset.empty_form.prefix }}">
-            {{ formset.empty_form.as_p }}
-        </div>
-
-        {% for form in formset %}
-            <div class="tab-pane{% if forloop.first %} active{% endif %}"
-                 id="{{ form.prefix }}">
-                {{ form.as_p }}
-            </div>
-        {% endfor %}
-    </div>
-
-    <button type="button" class="btn btn-primary" data-action="add-form">Add form</button>
-
-    <input type="submit" value="Save" />
-</form>
-
-<script type="text/javascript">
-    $(function() {
-        var formset = $('form > div.tab-content').children('.tab-pane').djangoFormset({
-            on: {
-                formAdded: function(event, form) {
-                    form.tab.elem.find('a').text("Tab #" + (form.index + 1));
-                }
-            }
-        });
-        $('form').on('click', '[data-action=add-form]', function(event) {
-            formset.addForm();
-        });
-     });
-</script>
-```
-
-### How it works
+[Dynamic with tabs]: https://github.com/mbertheau/jquery.django-formset-example/blob/master/blocks/templates/blocks/building_form_dynamic_tabs.html
 
 The tab functionality is triggered by the template form having the CSS class `tab-pane`.
 
@@ -179,119 +87,22 @@ formset_class = nestedformset_factory(
 )
 ```
 
-In the template:
-```html
-<form action="" method="post">
-    {% csrf_token %}
-    {{ outer_formset.management_form }}
-    {{ outer_formset.non_form_errors }}
-    <ul class="nav nav-tabs">
-        <li class="empty-form">
-            <a href="#{{ outer_formset.empty_form.prefix }}" data-toggle="tab">New tab</a>
-        </li>
-        {% for outer_form in outer_formset %}
-            <li class="{% if forloop.first %}active{% endif %}">
-            <a href="#{{ outer_form.prefix }}" data-toggle="tab">Tab #{{ forloop.counter }}</a>
-            </li>
-        {% endfor %}
-    </ul>
+[Template code][Dynamic nested with tabs]
 
-    <div class="tab-content form-inline">
-        <div class="tab-pane empty-form" id="{{ outer_formset.empty_form.prefix }}">
-            <div>
-                {{ outer_formset.empty_form.nested.management_form }}
-                <div class="empty-form">
-                    {{ outer_formset.empty_form.nested.empty_form.as_p }}
-                </div>
-                {% for inner_form in outer_formset.empty_form.nested %}
-                    <div>
-                        {{ inner_form.as_p }}
-                    </div>
-                {% endfor %}
-                <button type="button" class="btn btn-primary" data-action="add-inner-form">
-                    Add inner form
-                </button>
-            </div>
-            <div>
-                {{ outer_formset.empty_form.as_p }}
-            </div>
-        </div>
-        {% for outer_form in outer_formset %}
-            <div class="tab-pane{% if forloop.first %} active{% endif %}"
-                 id="{{ outer_form.prefix }}">
-                <div>
-                    {{ outer_form.nested.management_form }}
-                    {{ outer_form.nested.non_form_errors }}
-                    <div class="empty-form">
-                        {{ outer_form.nested.empty_form.as_p }}
-                    </div>
-                    {% for inner_form in outer_form.nested %}
-                        <div>
-                            {{ inner_form.as_p }}
-                        </div>
-                    {% endfor %}
-                    <button type="button" class="btn btn-primary" data-action="add-inner-form">
-                        Add inner form
-                    </button>
-                </div>
-                <div>
-                    {{ outer_form.as_p }}
-                </div>
-            </div>
-        {% endfor %}
-        <div class="actions">
-            <button type="button" class="btn btn-primary" data-action="add-outer-form">
-                Add outer form
-            </button>
-            <input type="submit" value="Save" />
-        </div>
-    </div>
-</form>
-
-<script type="text/javascript">
-    var outerFormset = $("div.tab-content > div.tab-pane").not('.actions')
-        .djangoFormset({
-        on: {
-            formInitialized: function(event, form) {
-                /* Init inner formset */
-                var innerFormsetElem = form.elem.children('div').first();
-                var innerFormset = innerFormsetElem.children('div').djangoFormset();
-                innerFormsetElem.on('click', '[data-action=add-inner-form]', function(event) {
-                    innerFormset.addForm();
-                });
-            },
-            formAdded: function(event, form) {
-                /* Optionally set tab header text on new forms */
-                form.tab.elem.find('a').text("Tab #" + (form.index + 1));
-            }
-        }
-    });
-    /* Add new outer form on add button click */
-    $('form').on('click', '[data-action=add-outer-form]', function(event) {
-        outerFormset.addForm();
-    });
-    /* Optionally update tab label based on input value */
-    $('form').on('change', 'input:not([name*="__prefix__"]):first', function() {
-        var tabLabel = "First input value is " + $(this).val();
-        form = $(this).closest('.tab-pane').data('djangoFormset.Form');
-        form.tab.elem.find('a').text(tabLabel);
-    });
-</script>
-```
-
-### How it works
+[Dynamic nested with tabs]: https://github.com/mbertheau/jquery.django-formset-example/blob/master/blocks/templates/blocks/building_form_dynamic_tabs_nested.html
 
 The plugin takes care to replace just the first occurrence of the template marker `__prefix__`. It
 also is careful not to leave the boundaries of the current form instance when it applies the needed
 modifications to the DOM. Lastly it provides events to hook up the initialization of the inner
 formset.
 
-I haven't tried it, but more than one nesting level should work just as fine.
+I haven't tried it, but more than one nesting level should work just fine.
 
 ## Release History
 
 ### 0.3.0 (unreleased)
 
+* Make examples available at [github.com/mbertheau/jquery.django-formset-example](https://github.com/mbertheau/jquery.django-formset-example)
 * Handle the delete input being inside its own label (#4)
 
 ### 0.2.0 (2014-09-02)
