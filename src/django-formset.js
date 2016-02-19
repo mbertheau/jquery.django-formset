@@ -207,6 +207,7 @@ var __hasProp = {}.hasOwnProperty,
         this.elem.remove();
         this.formset.handleFormRemoved(this.index);
       }
+      $(this.formset).trigger('formDeleted', [this]);
     };
 
     Form.prototype.hide = function() {

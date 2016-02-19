@@ -1,6 +1,6 @@
-/*! Django Formset - v0.3.0 - 2014-11-15
+/*! Django Formset - v0.3.0 - 2016-02-19
 * https://github.com/mbertheau/jquery.django-formset
-* Copyright (c) 2014 Markus Bertheau; Licensed MIT */
+* Copyright (c) 2016 Markus Bertheau; Licensed MIT */
 var __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -210,6 +210,7 @@ var __hasProp = {}.hasOwnProperty,
         this.elem.remove();
         this.formset.handleFormRemoved(this.index);
       }
+      $(this.formset).trigger('formDeleted', [this]);
     };
 
     Form.prototype.hide = function() {

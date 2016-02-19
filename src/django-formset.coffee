@@ -196,6 +196,8 @@
           @tab.elem.remove()
         @elem.remove()
         @formset.handleFormRemoved(@index)
+
+      $(@formset).trigger('formDeleted', [this])
       return
 
     hide: ->
