@@ -162,11 +162,13 @@ var __hasProp = {}.hasOwnProperty,
     }
 
     Form.prototype.getDeleteButton = function() {
-      return $("<button type='button' class='btn btn-danger'> " + this.formset.opts.deleteButtonText + " </button>");
+      return $("<button type='button' class='"+ this.formset.opts.deleteButtonClass +"'> " + this.formset.opts.deleteButtonText + " </button>");
     };
 
     Form.prototype.insertDeleteButton = function() {
-      if (this.deleteInput.length > 0) {
+      if (this.formset.opts.deleteButtonReplace) {
+        this.elem.find(this.formset.opts.deleteButtonReplace).replaceWith(this.deleteButton);
+      } else if (this.deleteInput.length > 0) {
         this.deleteInput.after(this.deleteButton);
       } else {
         (this.elem.is('TR') ? this.elem.children().last() : this.elem.is('UL') || this.elem.is('OL') ? this.elem.append('li').children().last() : this.elem).append(this.deleteButton);
@@ -326,7 +328,8 @@ var __hasProp = {}.hasOwnProperty,
     formTemplateClass: 'empty-form',
     formClass: $.fn.djangoFormset.Form,
     tabClass: $.fn.djangoFormset.Tab,
-    deleteButtonText: 'Delete'
+    deleteButtonText: 'Delete',
+    deleteButtonClass: 'btn btn-danger',
   };
   $.djangoFormset = {
     getTabActivator: function(id) {
